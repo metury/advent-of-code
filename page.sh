@@ -59,7 +59,7 @@ This is a solution of the day $subdir.
 					echo "# $file" >> "$out"
 					echo "" >> "$out"
 					echo "\`\`\`$(echo "$file" | cut -d. -f2)" >> "$out"
-					cat "$file" >> "$out"
+					expand -i -t2 "$file" >> "$out"
 					echo "\`\`\`" >> "$out"
 					echo "" >> "$out"
 				done

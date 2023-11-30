@@ -78,7 +78,7 @@ int findPath(const std::vector<std::vector<int>>& h, int s0, int s1){
 	q.push(s0);
 	q.push(s1);
 	q.push(0);
-	int neigh[][2] = {{-1, 0}, {1, 0}, {0, 1}, {0,-1}};
+	int neigh[][2] = { {-1, 0}, {1, 0}, {0, 1}, {0,-1} };
 	while(!q.empty()){
 		int p0 = q.front();
 		q.pop();
