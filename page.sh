@@ -56,12 +56,14 @@ permalink: $link$dir/$subdir/
 This is a solution of the day $subdir.
 " > "$out"
 				for file in *; do
-					echo "# $file" >> "$out"
-					echo "" >> "$out"
-					echo "\`\`\`$(echo "$file" | cut -d. -f2)" >> "$out"
-					expand -i -t2 "$file" >> "$out"
-					echo "\`\`\`" >> "$out"
-					echo "" >> "$out"
+					if [ "$file" != "INPUT" ]; then
+						echo "# $file" >> "$out"
+						echo "" >> "$out"
+						echo "\`\`\`$(echo "$file" | cut -d. -f2)" >> "$out"
+						expand -i -t2 "$file" >> "$out"
+						echo "\`\`\`" >> "$out"
+						echo "" >> "$out"
+					fi
 				done
 				cd ..
 			fi
