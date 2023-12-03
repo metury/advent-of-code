@@ -18,7 +18,8 @@ has_children: true
 # [Advent of code](https://adventofcode.com/)
 
 They are my solutions to advent of code tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.
-" > "adventofcode.md"
+
+Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someona made. :D" > "adventofcode.md"
 
 for dir in *; do
 	if [[ "$dir" == "$aoc_dir" ]]; then
@@ -54,6 +55,7 @@ permalink: $link$dir/$subdir/
 # Day $subdir
 
 This is a solution of the day $subdir.
+
 " > "$out"
 				for file in *; do
 					if [ "$file" != "INPUT" ]; then
