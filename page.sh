@@ -19,7 +19,7 @@ has_children: true
 
 They are my solutions to advent of code tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.
 
-Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someona made. :D" > "adventofcode.md"
+Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. :D" > "adventofcode.md"
 
 for dir in *; do
 	if [[ "$dir" == "$aoc_dir" ]]; then
