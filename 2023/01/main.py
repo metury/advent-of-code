@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-
 import ahocorasick
 
-# INitialize everythink
+# Initialize everythink
 first_sum = 0
 second_sum = 0
 numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']

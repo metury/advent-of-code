@@ -26,5 +26,6 @@ with open('INPUT') as f:
 		if under_limits(counters, limits):
 			first_sum += nr_game
 		second_sum += counters[0] * counters[1] * counters[2]
-	print(f"First part: {first_sum}")
-	print(f"Second part: {second_sum}")
+
+print(f"First part: {first_sum}")
+print(f"Second part: {second_sum}")

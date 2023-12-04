@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
+# Out of curiosity I got the time my solution.
+import time
+
 first_sum = 0
 second_sum = 0
+
+tic = time.perf_counter()
 
 with open('INPUT') as f:
 	multiples = [1]
@@ -28,5 +33,8 @@ with open('INPUT') as f:
 			points = 2 ** (len(res) - 1)
 		first_sum += points
 
+toc = time.perf_counter()
+
 print(f"First part: {first_sum}")
 print(f"Second part: {second_sum}")
+print(f"Time: {((toc - tic) * 1000):3f} ms")
