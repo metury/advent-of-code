@@ -7,29 +7,29 @@
 
 const char JOKER = 'J';
 
-std::map<char, int> mapping = {{'A', 12},
-	                           {'K', 11},
-	                           {'Q', 10},
-	                           {'J',  9},
-	                           {'T',  8},
-	                           {'9',  7},
-	                           {'8',  6},
-	                           {'7',  5},
-	                           {'6',  4},
-	                           {'5',  3},
-	                           {'4',  2},
-	                           {'3',  1},
-	                           {'2',  0}};
+std::map<char, int> mapping = { {'A', 12},
+	                            {'K', 11},
+	                            {'Q', 10},
+	                            {'J',  9},
+	                            {'T',  8},
+	                            {'9',  7},
+	                            {'8',  6},
+	                            {'7',  5},
+	                            {'6',  4},
+	                            {'5',  3},
+	                            {'4',  2},
+	                            {'3',  1},
+	                            {'2',  0}};
 
 struct Hand{
 	std::string hand;
 	int bet;
 	int rating;
 	void compute_rating(){
-		std::map<char, int> counters = {{'A', 0}, {'K', 0}, {'Q', 0}, {'J', 0},
-		                                {'T', 0}, {'9', 0}, {'8', 0}, {'7', 0},
-		                                {'6', 0}, {'5', 0}, {'4', 0}, {'3', 0},
-		                                {'2', 0}};
+		std::map<char, int> counters = { {'A', 0}, {'K', 0}, {'Q', 0}, {'J', 0},
+		                                 {'T', 0}, {'9', 0}, {'8', 0}, {'7', 0},
+		                                 {'6', 0}, {'5', 0}, {'4', 0}, {'3', 0},
+		                                 {'2', 0}};
 		for(size_t i = 0; i < hand.size(); ++i)
 			++counters[hand[i]];
 		size_t fives = 0;
@@ -51,10 +51,10 @@ struct Hand{
 		else rating = 0;
 	}
 	void compute_joker_rating(){
-		std::map<char, int> counters = {{'A', 0}, {'K', 0}, {'Q', 0}, {'J', 0},
-		                                {'T', 0}, {'9', 0}, {'8', 0}, {'7', 0},
-		                                {'6', 0}, {'5', 0}, {'4', 0}, {'3', 0},
-		                                {'2', 0}, {'J' , 0}};
+		std::map<char, int> counters = { {'A', 0}, {'K', 0}, {'Q', 0}, {'J', 0},
+		                                 {'T', 0}, {'9', 0}, {'8', 0}, {'7', 0},
+		                                 {'6', 0}, {'5', 0}, {'4', 0}, {'3', 0},
+		                                 {'2', 0}, {'J' , 0}};
 		for(size_t i = 0; i < hand.size(); ++i)
 			++counters[hand[i]];
 		size_t jokers = counters[JOKER];
