@@ -58,7 +58,7 @@ This is a solution of the day $subdir.
 
 " > "$out"
 				for file in *; do
-					if [ "$file" != "INPUT" ]; then
+					if [ "$file" != "INPUT" ] && [ "$file" != "main" ]; then
 						echo "# $file" >> "$out"
 						echo "" >> "$out"
 						echo "\`\`\`$(echo "$file" | cut -d. -f2)" >> "$out"
