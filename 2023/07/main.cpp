@@ -19,7 +19,7 @@ std::map<char, int> mapping = { {'A', 12},
 	                            {'5',  3},
 	                            {'4',  2},
 	                            {'3',  1},
-	                            {'2',  0}};
+	                            {'2',  0} };
 
 struct Hand{
 	std::string hand;
@@ -29,7 +29,7 @@ struct Hand{
 		std::map<char, int> counters = { {'A', 0}, {'K', 0}, {'Q', 0}, {'J', 0},
 		                                 {'T', 0}, {'9', 0}, {'8', 0}, {'7', 0},
 		                                 {'6', 0}, {'5', 0}, {'4', 0}, {'3', 0},
-		                                 {'2', 0}};
+		                                 {'2', 0} };
 		for(size_t i = 0; i < hand.size(); ++i)
 			++counters[hand[i]];
 		size_t fives = 0;
@@ -54,7 +54,7 @@ struct Hand{
 		std::map<char, int> counters = { {'A', 0}, {'K', 0}, {'Q', 0}, {'J', 0},
 		                                 {'T', 0}, {'9', 0}, {'8', 0}, {'7', 0},
 		                                 {'6', 0}, {'5', 0}, {'4', 0}, {'3', 0},
-		                                 {'2', 0}, {'J' , 0}};
+		                                 {'2', 0}, {'J' , 0} };
 		for(size_t i = 0; i < hand.size(); ++i)
 			++counters[hand[i]];
 		size_t jokers = counters[JOKER];
