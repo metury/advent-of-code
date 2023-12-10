@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from shapely import Polygon
+
 """ ==Constants== """
 START = 'S'
 EMPTY = '.'
@@ -66,47 +68,35 @@ def find_start_pos(sewers, starting_point):
 	else:
 		return (DOWN, x - 1, y)
 
-def outline(sewers, starting_point):
-	""" Create an outline of the pipeline. """
+def outline_and_coords(sewers, starting_point):
+	""" Create an outline of the pipeline.
+	    And also coordinates of the curved boundaries. """
 	pipeline = [[False for _ in x] for x in sewers]
+	coords = []
+	
 	pipeline[starting_point[0]][starting_point[1]] = True
+	coords.append((starting_point[0],starting_point[1]))
+	
 	pos = find_start_pos(sewers, starting_point)
+	
 	pipeline[pos[1]][pos[2]] = True
+	if sewers[pos[1]][pos[2]] != UP_DOWN and sewers[pos[1]][pos[2]] != LEFT_RIGHT:
+		coords.append((pos[1],pos[2]))
+	
 	pos = step(pos[0], sewers, pos[1], pos[2])
 	while sewers[pos[1]][pos[2]] != START:
 		pipeline[pos[1]][pos[2]] = True
+		if sewers[pos[1]][pos[2]] != UP_DOWN and sewers[pos[1]][pos[2]] != LEFT_RIGHT:
+			coords.append((pos[1],pos[2]))
 		pos = step(pos[0], sewers, pos[1], pos[2])
-	return pipeline
+	return pipeline, coords
 
-def distance(sewers, starting_point):
+def distance(outline):
 	""" Compute the distance of the pipeline. """
-	out = outline(sewers, starting_point)
 	my_sum = 0
-	for x in out:
+	for x in outline:
 		for y in x:
 			if y:
-				my_sum += 1
-	return my_sum
-
-def updated_outlines(sewers, outline):
-	""" Show pipes only in the loop. """
-	outlines = [["." for _ in x] for x in outline]
-	for i in range(len(sewers)):
-		for j in range(len(sewers[i])):
-			if outline[i][j]:
-				outlines[i][j] = sewers[i][j]
-	return outlines
-
-def compute_inline(upd_out):
-	""" This actually don't work for test input,
-	    but it worked for my real data. :P"""
-	my_sum = 0
-	for i in range(len(upd_out)):
-		lr = False
-		for j in range(len(upd_out[i])):
-			if upd_out[i][j] == UP_DOWN or upd_out[i][j] == DOWN_RIGHT or upd_out[i][j] == DOWN_LEFT:
-				lr = not lr
-			elif upd_out[i][j] == "." and lr:
 				my_sum += 1
 	return my_sum
 
@@ -117,8 +107,12 @@ with open('INPUT') as f:
 			starting_point = (len(sewers), sewer_line.index(START))
 		sewers.append(sewer_line)
 
-
-print(f"First part: {distance(sewers, starting_point) // 2}")
-out = outline(sewers, starting_point)
-upd = updated_outlines(sewers, out)
-print(f"Second part: {compute_inline(upd)}")
+pipeline, coords = outline_and_coords(sewers, starting_point)
+dist = distance(pipeline)
+# Create a polygon from the coordiantes.
+pgon = Polygon(coords)
+# Use Pick's Theorem
+# https://en.wikipedia.org/wiki/Pick%27s_theorem
+interior = int(pgon.area +1 - dist / 2)
+print(f"First part: { dist // 2}")
+print(f"Second part: {interior}")
