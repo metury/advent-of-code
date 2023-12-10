@@ -5,6 +5,7 @@ set -ueo pipefail
 aoc="Advent of code"
 link="/aoc/"
 aoc_dir="aoc"
+aoc_file="adventofcode.md"
 
 mkdir -p "$aoc_dir"
 
@@ -15,17 +16,18 @@ permalink: $link
 has_children: true
 ---
 
-# [Advent of code](https://adventofcode.com/)
+They are my solutions to [advent of code](https://adventofcode.com/) tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.
 
-They are my solutions to advent of code tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.
+Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. :D
 
-Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. :D" > "adventofcode.md"
+" > "$aoc_file"
 
 for dir in *; do
 	if [[ "$dir" == "$aoc_dir" ]]; then
 		continue
 	fi
 	if [ -d "$dir" ]; then
+		echo "- [Year $dir]($link$dir)" >> "$aoc_file"
 		cd "$dir" # move to the top level directory.
 		echo "---
 layout: page
@@ -35,13 +37,12 @@ permalink: $link$dir/
 has_children: true
 ---
 
-# Year $dir
-
 This contains tasks from the year $dir.
 
 " > ../"$aoc_dir"/"$dir".md
 		for subdir in *; do
 			if [ -d "$subdir" ]; then
+				echo "- [Day $subdir]($link$dir/$subdir/)" >> ../"$aoc_dir"/"$dir".md
 				cd "$subdir" # move to the inner directory
 				out="../../$aoc_dir/$dir-$subdir.md"
 				echo "---
@@ -51,8 +52,6 @@ parent: Year $dir
 grand_parent: $aoc
 permalink: $link$dir/$subdir/
 ---
-
-# Day $subdir
 
 This is a solution of the day $subdir.
 
