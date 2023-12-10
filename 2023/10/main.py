@@ -88,77 +88,44 @@ def outline(sewers, starting_point):
 		pos = step(pos[0], sewers, pos[1], pos[2])
 	return pipeline
 
-def compute_r_inline(sewers, outline):
-	inbounds = [[False for _ in x] for x in outline]
-	for i in range(len(sewers)):
-		inbound = False
-		continuous = 0
-		for j in range(len(sewers[i])):
-			if outline[i][len(sewers[i]) - 1 - j]:
-				inbound = not inbound
-				continuous += 1
-			else:
-				inbounds[i][len(sewers[i]) - 1 - j] = inbound or (continuous % 2 == 0 and continuous > 0)
-				continuous = 0
-			if inbounds[i][len(sewers[i]) - 1 - j]:
-				print("I", end="")
-			else:
-				print(".", end="")
-		print()
-	print()
-	return inbounds
-
-def compute_f_inline(sewers, outline):
-	inbounds = [[False for _ in x] for x in outline]
-	for i in range(len(sewers)):
-		inbound = False
-		continuous = 0
-		for j in range(len(sewers[i])):
-			if outline[i][j]:
-				inbound = not inbound
-			else:
-				inbounds[i][j] = inbound or (continuous % 2 == 0 and continuous > 0)
-				continuous = 0
-			if inbounds[i][j]:
-				print("I", end="")
-			else:
-				print(".", end="")
-		print()
-	print()
-	return inbounds
-
-def alt_compute_inline(sewers, outline):
-	f = compute_f_inline(sewers, outline)
-	r = compute_r_inline(sewers, outline)
-	inbounds = [[False for _ in x] for x in outline]
+def updated_outlines(sewers, outline):
+	outlines = [["." for _ in x] for x in outline]
 	for i in range(len(sewers)):
 		for j in range(len(sewers[i])):
-			inbounds[i][j] = f[i][j] and r[i][j]
-			if inbounds[i][j]:
-				print("I", end="")
-			else:
-				print(".", end="")
+			if sewers[i][j] == "|" and outline[i][j]:
+				outlines[i][j] = "|"
+			elif sewers[i][j] == "-" and outline[i][j]:
+				outlines[i][j] = "-"
+			elif outline[i][j]:
+				outlines[i][j] = "#"
+			print(outlines[i][j], end="")
 		print()
-	return inbounds 
+	return outlines
 
-def compute_inline(sewers, outline):
+def compute_inline(upd_out):
+	up_down = [False for _ in upd_out[0]]
 	my_sum = 0
-	for i in range(len(sewers)):
-		inbound = False
-		for j in range(len(sewers[i])):
-			if outline[i][j]:
-				inbound = not inbound
-				if inbound:
-					print("(", end = "")
-				else:
-					print(")", end = "")
-			elif inbound and outline[i][j] != LEFT_RIGHT:
-				my_sum += 1
-				print("I", end="")
+	for i in range(len(upd_out)):
+		left_right = False
+		for j in range(len(upd_out[i])):
+			if upd_out[i][j] == "#": # This is wrong.
+				left_right = not left_right
+				up_down[j] = not up_down[j]
+				print("#", end="")
+			elif upd_out[i][j] == "|":
+				left_right = not left_right
+				print("|", end="")
+			elif upd_out[i][j] == "-":
+				up_down[j] = not up_down[j]
+				print("-", end="")
 			else:
-				print(sewers[i][j], end="")
+				if up_down[j] and left_right:
+					my_sum += 1
+					print("I", end="")
+				else:
+					print("O", end="")
 		print()
-	return my_sum
+	print(my_sum)
 
 def print_outline(pipeline):
 	for x in pipeline:
@@ -181,4 +148,6 @@ print(f"First part: {distance(sewers, starting_point) // 2}")
 out = outline(sewers, starting_point)
 print_outline(out)
 print()
-alt_compute_inline(sewers, out)
+updated_outlines(sewers, out)
+print()
+compute_inline(updated_outlines(sewers, out))
