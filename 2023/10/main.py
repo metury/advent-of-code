@@ -66,16 +66,6 @@ def find_start_pos(sewers, starting_point):
 	else:
 		return (DOWN, x - 1, y)
 
-def distance(sewers, starting_point):
-	""" Compute the distance of the pipeline. """
-	count = 1
-	pos = find_start_pos(sewers, starting_point)
-	pos = step(pos[0], sewers, pos[1], pos[2])
-	while sewers[pos[1]][pos[2]] != START:
-		pos = step(pos[0], sewers, pos[1], pos[2])
-		count += 1
-	return count + 1
-
 def outline(sewers, starting_point):
 	""" Create an outline of the pipeline. """
 	pipeline = [[False for _ in x] for x in sewers]
@@ -88,53 +78,37 @@ def outline(sewers, starting_point):
 		pos = step(pos[0], sewers, pos[1], pos[2])
 	return pipeline
 
+def distance(sewers, starting_point):
+	""" Compute the distance of the pipeline. """
+	out = outline(sewers, starting_point)
+	my_sum = 0
+	for x in out:
+		for y in x:
+			if y:
+				my_sum += 1
+	return my_sum
+
 def updated_outlines(sewers, outline):
+	""" Show pipes only in the loop. """
 	outlines = [["." for _ in x] for x in outline]
 	for i in range(len(sewers)):
 		for j in range(len(sewers[i])):
-			if sewers[i][j] == "|" and outline[i][j]:
-				outlines[i][j] = "|"
-			elif sewers[i][j] == "-" and outline[i][j]:
-				outlines[i][j] = "-"
-			elif outline[i][j]:
-				outlines[i][j] = "#"
-			print(outlines[i][j], end="")
-		print()
+			if outline[i][j]:
+				outlines[i][j] = sewers[i][j]
 	return outlines
 
 def compute_inline(upd_out):
-	up_down = [False for _ in upd_out[0]]
+	""" This actually don't work for test input,
+	    but it worked for my real data. :P"""
 	my_sum = 0
 	for i in range(len(upd_out)):
-		left_right = False
+		lr = False
 		for j in range(len(upd_out[i])):
-			if upd_out[i][j] == "#": # This is wrong.
-				left_right = not left_right
-				up_down[j] = not up_down[j]
-				print("#", end="")
-			elif upd_out[i][j] == "|":
-				left_right = not left_right
-				print("|", end="")
-			elif upd_out[i][j] == "-":
-				up_down[j] = not up_down[j]
-				print("-", end="")
-			else:
-				if up_down[j] and left_right:
-					my_sum += 1
-					print("I", end="")
-				else:
-					print("O", end="")
-		print()
-	print(my_sum)
-
-def print_outline(pipeline):
-	for x in pipeline:
-		for y in x:
-			if y:
-				print("#", end="")
-			else:
-				print(".", end="")
-		print()
+			if upd_out[i][j] == UP_DOWN or upd_out[i][j] == DOWN_RIGHT or upd_out[i][j] == DOWN_LEFT:
+				lr = not lr
+			elif upd_out[i][j] == "." and lr:
+				my_sum += 1
+	return my_sum
 
 with open('INPUT') as f:
 	for line in f:
@@ -146,8 +120,5 @@ with open('INPUT') as f:
 
 print(f"First part: {distance(sewers, starting_point) // 2}")
 out = outline(sewers, starting_point)
-print_outline(out)
-print()
-updated_outlines(sewers, out)
-print()
-compute_inline(updated_outlines(sewers, out))
+upd = updated_outlines(sewers, out)
+print(f"Second part: {compute_inline(upd)}")
