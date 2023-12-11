@@ -2,7 +2,7 @@
 
 set -ueo pipefail
 
-aoc="Advent of code"
+aoc="advent of code"
 link="/aoc/"
 aoc_dir="aoc"
 aoc_file="adventofcode.md"
