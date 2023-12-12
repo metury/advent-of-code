@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from multiprocessing import Pool
+
 first_sum = 0
 second_sum = 0
 
@@ -14,7 +16,6 @@ def count(array):
 			current += 1
 	if current > 0:
 		counter.append(current)
-	#print(f"Ar: {array}, counter: {counter}")
 	return counter
 
 def compare(counter, image):
@@ -85,14 +86,34 @@ def multiply(array, image):
 		for i in origin_image:
 			image.append(i)
 
+lines = []
+
+print("[",end="")
+
 with open('INPUT') as f:
 	for line in f:
-		parts = line.strip().split(" ")
-		array = [x for x in parts[0]]
-		image = [int(x) for x in parts[1].split(",")]
-		first_sum += try_fast(array, image, 0, 0, 0)
-		multiply(array, image)
-		second_sum += try_fast(array, image, 0, 0, 0)
+		lines.append(line)
+
+def f(line):
+	parts = line.strip().split(" ")
+	array = [x for x in parts[0]]
+	image = [int(x) for x in parts[1].split(",")]
+	first = try_fast(array, image, 0, 0, 0)
+	multiply(array, image)
+	second = try_fast(array, image, 0, 0, 0)
+	print("-",end="")
+	return (first, second)
+
+res = []
+
+with Pool(7) as p:
+	res = p.map(f, lines)
+
+for c in res:
+	first_sum += c[0]
+	second_sum += c[1]
+
+print("]")
 
 print(f"First part: {first_sum}")
 print(f"Second part: {second_sum}")
