@@ -85,6 +85,8 @@ def multiply(array, image):
 		for i in origin_image:
 			image.append(i)
 
+print("[",end="")
+
 with open('INPUT') as f:
 	for line in f:
 		parts = line.strip().split(" ")
@@ -93,6 +95,8 @@ with open('INPUT') as f:
 		first_sum += try_fast(array, image, 0, 0, 0)
 		multiply(array, image)
 		second_sum += try_fast(array, image, 0, 0, 0)
+		print("-",end="")
+print("]")
 
 print(f"First part: {first_sum}")
 print(f"Second part: {second_sum}")
