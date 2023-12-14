@@ -3,3 +3,5 @@ INPUT
 OUTPUT
 aoc/
 adventofcode.md
+target/
+*.lock
