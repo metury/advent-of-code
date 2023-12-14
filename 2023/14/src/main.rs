@@ -85,25 +85,27 @@ fn shift_array(matrix: &mut Vec<Vec<char>>, row_start : usize, column_start : us
 }
 
 fn shift_side(matrix: &mut Vec<Vec<char>>, side: Side){
-	if side == Side::North{
-		for i in 0..matrix[0].len(){
-			shift_array(matrix, 0, i, true, false);
-		}
-	}
-	if side == Side::South{
-		for i in 0..matrix[0].len(){
-			shift_array(matrix, matrix.len() - 1, i, true, true);
-		}
-	}
-	if side == Side::East{
-		for i in 0..matrix[0].len(){
-			shift_array(matrix, i, matrix[i].len() - 1, false, true);
-		}
-	}
-	if side == Side::West{
-		for i in 0..matrix[0].len(){
-			shift_array(matrix, i, 0, false, false);
-		}
+	match side{
+		Side::North => {
+			for i in 0..matrix[0].len(){
+				shift_array(matrix, 0, i, true, false);
+			}
+		},
+		Side::South => {
+			for i in 0..matrix[0].len(){
+				shift_array(matrix, matrix.len() - 1, i, true, true);
+			}
+		},
+		Side::East => {
+			for i in 0..matrix[0].len(){
+				shift_array(matrix, i, matrix[i].len() - 1, false, true);
+			}
+		},
+		Side::West => {
+			for i in 0..matrix[0].len(){
+				shift_array(matrix, i, 0, false, false);
+			}
+		},
 	}
 }
 
