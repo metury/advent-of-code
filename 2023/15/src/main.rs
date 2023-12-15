@@ -26,12 +26,37 @@ fn ascii_hash(string: &str) -> i32{
 	return hash;
 }
 
-fn insert_to_map(hash_map: &mut [LinkedList<i32>; 256], lens: i32, key: &str){
-	let hash = ascii_hash(key);
-	let list = &hash_map[hash as usize];
-	if list.contains(&hash){
-		// This is actually nonsense.
+fn insert_to_map(hash_map: &mut Vec<LinkedList<(String, i32)>>, lens: i32, key: &str){
+	let hash = ascii_hash(key) as usize;
+	for element in &mut hash_map[hash]{
+		if element.0 == key{
+			element.1 = lens;
+			return;
+		}
 	}
+	hash_map[hash].push_back((key.to_string(), lens));
+}
+
+fn remove_from_map(hash_map: &mut Vec<LinkedList<(String, i32)>>, key: &str){
+	let hash = ascii_hash(key) as usize;
+	let mut j: usize = 0;
+	for element in &mut hash_map[hash]{
+		if element.0 == key{
+			let mut last = hash_map[hash].split_off(j);
+			last.pop_front();
+			hash_map[hash].append(&mut last);
+			return;
+		}
+		j += 1;
+	}
+}
+
+fn init_hash_map(size: i32) -> Vec<LinkedList<(String, i32)>>{
+	let mut hash_map: Vec<LinkedList<(String, i32)>> = vec!();
+	for _ in 0..size{
+		hash_map.push(LinkedList::new());
+	}
+	return hash_map;
 }
 
 
@@ -45,24 +70,24 @@ fn part1(){
 }
 
 fn part2(){
-	let mut hash_map: [LinkedList<i32>; 256] = [LinkedList::new(); 256];
+	let mut hash_map = init_hash_map(256);
 	let strings = read_file("INPUT");
 	let mut total = 0;
 	for string in strings{
 		if string.chars().nth(string.len() - 1) == Some('-'){
-			let key = &string[0..string.len() - 2];
-			// Remove.
+			let key = &string[0..string.len() - 1];
+			remove_from_map(&mut hash_map, key);
 		}
 		else if string.chars().nth(string.len() - 2) == Some('='){
-			let lens = string.chars().nth(string.len() - 1).unwrap();
-			let key = &string[0..string.len() - 3];
-			// Insert
+			let lens = string.chars().nth(string.len() - 1).unwrap() as i32 - '0' as i32;
+			let key = &string[0..string.len() - 2];
+			insert_to_map(&mut hash_map, lens, key);
 		}
 	}
 	for i in 0..hash_map.len(){
 		let mut j = 0;
-		for element in hash_map[i]{
-			total += (i + 1) * (j + 1) * (element as usize);
+		for element in &hash_map[i]{
+			total += (i + 1) * (j + 1) * (element.1 as usize);
 			j += 1;
 		}
 	}
