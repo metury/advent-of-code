@@ -1,4 +1,5 @@
 use std::fs;
+use std::collections::LinkedList;
 
 fn read_file(filepath: &str) -> Vec<String>{
 	let contents = fs::read_to_string(filepath);
@@ -25,24 +26,6 @@ fn ascii_hash(string: &str) -> i32{
 	return hash;
 }
 
-struct Node{
-	lens: i32,
-	next: Box<Node>,
-}
-
-struct AsciiHasMap{
-	boxes: [Node; 256],
-}
-
-impl Node{
-	fn add_node(lens: i32){
-		let mut node = Self.next;
-		while node.lens != -1{
-			node = node.next;
-		}
-	}
-}
-
 
 fn part1(){
 	let strings = read_file("INPUT");
@@ -54,10 +37,17 @@ fn part1(){
 }
 
 fn part2(){
-	
+	let mut hash_map: [LinkedList<i32>; 256];
+	let strings = read_file("INPUT");
+	let mut total = 0;
+	for string in strings{
+		if string.chars().nth(string.len() - 1) == Some('-'){
+			println!("S");
+		}
+	}
 }
 
 fn main() {
 	part1();
-	//part2();
+	part2();
 }
