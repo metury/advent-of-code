@@ -25,6 +25,24 @@ fn ascii_hash(string: &str) -> i32{
 	return hash;
 }
 
+struct Node{
+	lens: i32,
+	next: Box<Node>,
+}
+
+struct AsciiHasMap{
+	boxes: [Node; 256],
+}
+
+impl Node{
+	fn add_node(lens: i32){
+		let mut node = Self.next;
+		while node.lens != -1{
+			node = node.next;
+		}
+	}
+}
+
 
 fn part1(){
 	let strings = read_file("INPUT");
