@@ -145,6 +145,7 @@ fn part2(){
 }
 
 fn main() {
+	println!("Day {} - {}", 16, "The Floor Will Be Lava");
 	part1();
 	part2();
 }
