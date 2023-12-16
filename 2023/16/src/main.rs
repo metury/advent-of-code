@@ -1,6 +1,7 @@
 use std::fs;
 use std::collections::HashMap;
 
+/** Read the input file and return the matrix and empty visited map. */
 fn read_file(filepath: &str) -> (Vec<Vec<char>>, Vec<Vec<bool>>){
 	let contents = fs::read_to_string(filepath);
 	let mut matrix: Vec<Vec<char>> = vec![];
@@ -20,6 +21,7 @@ fn read_file(filepath: &str) -> (Vec<Vec<char>>, Vec<Vec<bool>>){
 	return (matrix, found);
 }
 
+/** Get the key to the hash function. */
 fn get_key(position: (usize, usize), movement: (i32, i32)) -> String{
 	let mut key = String::from("");
 	key += &position.0.to_string();
@@ -32,6 +34,7 @@ fn get_key(position: (usize, usize), movement: (i32, i32)) -> String{
 	return key;
 }
 
+/** Move one tile in a matrix. Also check and if it was used do not go there again. */
 fn move_matrix(matrix: &Vec<Vec<char>>, found: &mut Vec<Vec<bool>>, position: (usize, usize), movement: (i32, i32), history: &mut HashMap<String, bool>){
 	if position.0 >= matrix.len() || position.1 >= matrix[position.0].len(){
 		return;
@@ -85,6 +88,7 @@ fn move_matrix(matrix: &Vec<Vec<char>>, found: &mut Vec<Vec<bool>>, position: (u
 	}
 }
 
+/** Count the visited places. */
 fn count_visited(found: &Vec<Vec<bool>>) -> i64{
 	let mut total: i64 = 0;
 	for line in found{
@@ -97,6 +101,7 @@ fn count_visited(found: &Vec<Vec<bool>>) -> i64{
 	return total;
 }
 
+/** Try one possibility. */
 fn try_one(matrix: & Vec<Vec<char>>, found: &Vec<Vec<bool>>, position: (usize, usize), movement: (i32, i32)) -> i64{
 	let mut f = found.clone();
 	let mut h: HashMap<String, bool> = HashMap::new();
@@ -104,6 +109,7 @@ fn try_one(matrix: & Vec<Vec<char>>, found: &Vec<Vec<bool>>, position: (usize, u
 	return count_visited(&f);
 }
 
+/** Move in the matrix. */
 fn part1(){
 	let (matrix, mut found) = read_file("INPUT");
 	let mut history: HashMap<String, bool> = HashMap::new();
@@ -111,6 +117,7 @@ fn part1(){
 	println!("Part 1: {}", count_visited(&found));
 }
 
+/** Try all posibilitie. */
 fn part2(){
 	let (matrix, found) = read_file("INPUT");
 	let mut max: i64 = 0;
