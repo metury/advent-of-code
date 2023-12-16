@@ -10,6 +10,7 @@ aoc="advent of code"
 link="/aoc/"
 aoc_dir="aoc"
 aoc_file="adventofcode.md"
+forbidden_files="INPUT OUTPUT Cargo.toml Cargo.lock info.md main"
 
 ## ==================== ##
 ##  Functions           ##
@@ -59,13 +60,12 @@ permalink: $link$2/$1/
 ---
 
 This is a solution of the day $1.
-
 " > "$3"
 }
 
 # File, and where to print it.
 print_file(){
-	echo "# $1" >> "$2"
+	echo "## $1" >> "$2"
 	echo "" >> "$2"
 	echo "\`\`\`$(echo "$1" | cut -d. -f2)" >> "$2"
 	expand -i -t2 "$1" >> "$2"
@@ -94,7 +94,19 @@ for dir in *; do
 				out="../../$aoc_dir/$dir-$subdir.md"
 				print_day "$subdir" "$dir" "$out"
 				for file in *; do
-					if [ "$file" != "INPUT" ] && [ "$file" != "main" ] && [ "$file" != "Cargo.lock" ] && [ "$file" != "Cargo.toml" ]; then
+					useful=1
+					for forb in $forbidden_files; do
+						if [[ "$file" == "$forb" ]]; then
+							useful=0
+						fi
+					done
+					if [[ "$file" == "info.md" ]]; then
+						echo "### Info" >> "$out"
+						echo "" >> "$out"
+						cat "$file" >> "$out"
+						echo >> "$out"
+					fi
+					if [[ $useful == 1 ]]; then
 						if [ -d "$file" ]; then
 							if [ "$file" == "src" ]; then
 								cd "$file"
