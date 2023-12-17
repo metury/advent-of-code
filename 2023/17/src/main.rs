@@ -1,5 +1,5 @@
 use std::fs;
-use petgraph::graph::{Graph, NodeIndex};
+use petgraph::graph::{DiGraph, NodeIndex};
 use petgraph::algo::dijkstra;
 
 fn read_file(filepath: &str) -> (Vec<Vec<i8>>, Vec<Vec<i64>>){
@@ -24,16 +24,19 @@ fn read_file(filepath: &str) -> (Vec<Vec<i8>>, Vec<Vec<i64>>){
 
 }
 
+#[derive(Debug)]
 struct Node{
 	position: (usize, usize),
 	movement: (i64, i64),
 	limit: i8,
 }
 
-fn create_graph(grid: &Vec<Vec<i8>>) -> (Graph<Node, i64>, NodeIndex) {
-	let mut graph = Graph::<Node,i64>::new();
+fn create_graph(grid: &Vec<Vec<i8>>) -> (DiGraph<Node, i64>, NodeIndex, NodeIndex) {
+	let mut graph = DiGraph::<Node,i64>::new();
 	let moves = [(0,1), (0,-1), (1,0), (-1,0)];
 	let mut nodes: Vec<(Node, NodeIndex)> = vec!();
+	let starting_node = graph.add_node(Node{position: (0,0), movement: (0,0), limit: 4});
+	let ending_node = graph.add_node(Node{position: (0,0), movement: (0,0), limit: 5});
 	for i in 0..grid.len() {
 		for j in 0..grid[i].len() {
 			for m in moves {
@@ -44,36 +47,45 @@ fn create_graph(grid: &Vec<Vec<i8>>) -> (Graph<Node, i64>, NodeIndex) {
 			}
 		}
 	}
-	for i in 0..nodes.len() - 1 {
-		for j in 0..nodes.len() - 1 {
-			let pos_i = nodes[i].0.position;
+	for i in 0..nodes.len() {
+		let pos_i = nodes[i].0.position;
+		let mov_i = nodes[i].0.movement;
+		let limit_i = nodes[i].0.limit;
+		for j in 0..nodes.len() {
 			let pos_j = nodes[j].0.position;
 			let mov_j = nodes[j].0.movement;
-			let limit_i = nodes[j].0.limit;
 			let limit_j = nodes[j].0.limit;
 			let same_row: bool = pos_i.0 as i64 + mov_j.0 == pos_j.0 as i64
 			                  && pos_i.1 as i64 + mov_j.1 == pos_j.1 as i64
-			                  && limit_i < 2 && limit_i + 1 == limit_j;
-			let left: bool = pos_i.0 as i64 + mov_j.1 == pos_j.0 as i64
-			              && pos_j.0 as i64 + mov_j.0 == pos_j.0 as i64
+			                  && mov_i == mov_j
+			                  && limit_j < 2 && limit_i + 1 == limit_j;
+			let left: bool = pos_i.0 as i64 + mov_j.0 == pos_j.0 as i64
+			              && pos_i.1 as i64 + mov_j.1 == pos_j.1 as i64
+			              && mov_i.0 == mov_j.1 && mov_i.1 == mov_j.0
 			              && limit_j == 0;
-			let right: bool = pos_i.0 as i64 - mov_j.1 == pos_j.0 as i64
-			               && pos_j.0 as i64 - mov_j.0 == pos_j.0 as i64
+			let right: bool = pos_i.0 as i64 + mov_j.0 == pos_j.0 as i64
+			               && pos_i.1 as i64 + mov_j.1 == pos_j.1 as i64
+			               && mov_i.0 == -mov_j.1 && mov_i.1 == -mov_j.0
 			               && limit_j == 0;
 			if same_row || left || right {
 				graph.add_edge(nodes[i].1, nodes[j].1, grid[pos_j.0][pos_j.1] as i64);
 			}
 		}
+		if pos_i == (0,0) && (mov_i == (0,1) || mov_i == (1,0)) && limit_i == 0 {
+			graph.add_edge(starting_node, nodes[i].1, 0);
+		}
+		if pos_i == (grid.len() - 1, grid.len() - 1) {
+			graph.add_edge(nodes[i].1, ending_node, 0);
+		}
 	}
-	return (graph, nodes[0].1);
+	return (graph, starting_node, ending_node);
 }
 
 fn part1(){
 	let (grid, mut paths) = read_file("INPUT");
-	let (graph, start_node) = create_graph(&grid);
-	let distances = dijkstra(&graph, start_node, None, |_| 1);
-	println!("{:?}", distances);
-	println!("Part 1: {}", 0);
+	let (graph, start_node, ending_node) = create_graph(&grid);
+	let distances = dijkstra(&graph, start_node, None, |e| *e.weight() );
+	println!("Part 1: {}", distances[&ending_node]);
 }
 
 fn part2(){
