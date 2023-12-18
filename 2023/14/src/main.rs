@@ -144,13 +144,13 @@ fn insert_to_history(matrix: & Vec<Vec<char>>, history: &mut HashMap<String, i64
 	return -1;
 }
 
-fn part1(){
+fn part1() {
 	let mut matrix = read_file("INPUT");
 	shift_side(&mut matrix, Side::North);
 	println!("Part 1: {}", compute(&matrix));
 }
 
-fn part2(){
+fn part2() {
 	let mut matrix = read_file("INPUT");
 	let mut history: HashMap<String, i64> = HashMap::new();
 	let cycles:i64 = 1_000_000_000;

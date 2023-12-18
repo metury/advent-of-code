@@ -62,12 +62,12 @@ fn parse_string(string: &str) -> Instruction {
 	(string.chars().nth(len).unwrap(), num)
 }
 
-fn part1(){
+fn part1() {
 	let (instructions, _) = read_file("INPUT");
 	println!("Part 1: {}", compute_from_instructions(&instructions));
 }
 
-fn part2(){
+fn part2() {
 	let (_, strings) = read_file("INPUT");
 	let instructions: Vec<Instruction> = strings.into_iter()
 	                                            .map(|string| { parse_string(&string) })

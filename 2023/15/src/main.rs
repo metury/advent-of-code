@@ -60,7 +60,7 @@ fn init_hash_map(size: i32) -> Vec<LinkedList<(String, i32)>>{
 }
 
 
-fn part1(){
+fn part1() {
 	let strings = read_file("INPUT");
 	let mut total = 0;
 	for string in strings{
@@ -69,7 +69,7 @@ fn part1(){
 	println!("Part 1: {}", total);
 }
 
-fn part2(){
+fn part2() {
 	let mut hash_map = init_hash_map(256);
 	let strings = read_file("INPUT");
 	let mut total = 0;

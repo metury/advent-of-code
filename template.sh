@@ -15,8 +15,6 @@ wget "https://adventofcode.com/$year/day/$day" -O "$file"
 title=$(grep -o -e "--- Day [0-9]*: .* ---" "$file")
 tmp=${title#*: }
 name=${tmp% ---*}
-echo "$name"
-echo "DD"
 rm "$file"
 
 day=$(printf "%02d" $day)
@@ -46,11 +44,11 @@ fn read_file(filepath: &str) -> {
 	return;
 }
 
-fn part1(){
+fn part1() {
 	println!(\"Part 1: {}\", 0);
 }
 
-fn part2(){
+fn part2() {
 	println!(\"Part 2: {}\", 0);
 }
 
