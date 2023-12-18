@@ -2,10 +2,8 @@
 
 Some of my solutions to advent of code.
 
-This repo is separated firstly by years, then by days.
-
 > [!IMPORTANT]
-> Inputs are read from `INPUT` file in the respected folder. There may be optional `info.md` to give information about the solution.
+> This repo is separated firstly by years, then by days. Inputs are read from `INPUT` file in the respected folder. There may be optional `info.md` to give information about the solution.
 
 > [!TIP]
 > ### Scripts
