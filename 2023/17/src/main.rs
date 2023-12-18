@@ -219,12 +219,12 @@ fn get_cost(map: &Grid<usize>, source: Position, destination: Position, min: usi
 }
 
 fn part1(){
-	let grid = read_file("INPUT");
+	let grid = read_file("../INPUT");
 	println!("Part 1: {}", get_cost(&grid, (0,0), (grid.len() - 1, grid.len() - 1), 0, 3));
 }
 
 fn part2(){
-	let grid = read_file("INPUT");
+	let grid = read_file("../INPUT");
 	println!("Part 2: {}", get_cost(&grid, (0,0), (grid.len() - 1, grid.len() - 1), 4, 10));
 }
 

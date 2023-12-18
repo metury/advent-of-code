@@ -113,7 +113,7 @@ fn try_one(matrix: & Vec<Vec<char>>, visited: &Vec<Vec<bool>>, position: (usize,
 
 /** Move in the matrix. */
 fn part1(){
-	let (matrix, mut visited) = read_file("INPUT");
+	let (matrix, mut visited) = read_file("../INPUT");
 	let mut history: HashMap<String, bool> = HashMap::new();
 	step(&matrix, &mut visited, (0,0), (0,1), &mut history);
 	println!("Part 1: {}", count_visited(&visited));
@@ -121,7 +121,7 @@ fn part1(){
 
 /** Try all posibilitie. */
 fn part2(){
-	let (matrix, visited) = read_file("INPUT");
+	let (matrix, visited) = read_file("../INPUT");
 	let mut max: i64 = 0;
 	for i in 1..matrix.len() - 1{
 		let c = try_one(&matrix, &visited, (i,0), (0,1));
