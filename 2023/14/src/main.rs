@@ -170,6 +170,7 @@ fn part2(){
 }
 
 fn main() {
+	println!("Year 2023 day 14 - Parabolic Reflector Dish");
 	part1();
 	part2();
 }

@@ -7,7 +7,4 @@ This repo is separated firstly by years, then by days. Always inputs are read fr
 ### Scripts
 
 - `page.sh` Is for generating pages for jekyll.
-- `rust-templ.sh` takes three arguments `year` `day` `name` and it will create new rust project.
-- `py-templ.sh` similarly to rust is to creating python template.
-
-Note some other templates may follow.
+- `template.sh` Is for creating the same rust template for other days. At least name of the problem must be set as the first argument. If there are three arguments the second is for year and the third for day. Otherwise take sys date.
