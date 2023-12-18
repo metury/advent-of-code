@@ -2,19 +2,22 @@
 
 set -ueo pipefail
 
-if [ $# -lt 1 ]; then
-	echo "You must provide a name as an argument."
-	exit
-fi
-
 day=$(date +'%d')
 year=$(date +'%Y')
-name=$1
 
-if [ $# -gt 2 ]; then
-	day=$3
-	year=$2
+if [ $# -gt 1 ]; then
+	year=$1
+	day=$2
 fi
+
+file=$(mktemp)
+wget "https://adventofcode.com/$year/day/$day" -O "$file"
+title=$(grep -o -e "--- Day [0-9]*: .* ---" "$file")
+tmp=${title#*: }
+name=${tmp% ---*}
+echo "$name"
+echo "DD"
+rm "$file"
 
 day=$(printf "%02d" $day)
 
@@ -59,12 +62,13 @@ fn main() {
 
 cd ..
 
+info="info.md"
 touch "INPUT"
-touch "info.md"
+touch "$info"
 
 echo "#### Part 1
 
 #### Part 2
-" > "info.md"
+" > "$info"
 
 cd ..
