@@ -1,12 +1,12 @@
 use std::fs;
-use std::collections::HashMap;
+use geo::{Coord, Polygon, Area, coord, LineString};
 
-type Grid<T> = Vec<Vec<T>>;
 type Point<T> = (T,T);
-type Instruction = (char, i32, String);
+type Instruction = (char, i32);
 
-fn read_file(filepath: &str) -> Vec<Instruction> {
+fn read_file(filepath: &str) -> (Vec<Instruction>, Vec<String>) {
 	let mut instructions: Vec<Instruction> = vec!();
+	let mut strings: Vec<String> = vec!();
 	let contents = fs::read_to_string(filepath);
 	let binding = contents.expect("REASON");
 	let lines = binding.split('\n');
@@ -14,105 +14,65 @@ fn read_file(filepath: &str) -> Vec<Instruction> {
 		if line != "" {
 			let mut parts = line.split(' ');
 			let instruction = (parts.next().unwrap().chars().nth(0).unwrap(),
-							   parts.next().unwrap().parse::<i32>().unwrap(),
-							   parts.next().unwrap().to_string());
+							   parts.next().unwrap().parse::<i32>().unwrap());
 			instructions.push(instruction);
+			strings.push(parts.next().unwrap().to_string());
 		}
 	}
-	return instructions;
+	return (instructions, strings);
 }
 
 fn step(instruction: &Instruction, point: &Point<i32>) -> Point<i32> {
 	match instruction.0 {
-		'L' => (point.0, point.1 - instruction.1),
-		'R' => (point.0, point.1 + instruction.1),
-		'U' => (point.0 - instruction.1, point.1),
-		'D' => (point.0 + instruction.1, point.1),
+		'0' | 'R' => (point.0, point.1 + instruction.1),
+		'1' | 'D' => (point.0 + instruction.1, point.1),
+		'2' |'L' => (point.0, point.1 - instruction.1),
+		'3' | 'U' => (point.0 - instruction.1, point.1),
 		_   => (point.0, point.1),
 	}
 }
 
-fn outline(grid: &mut Grid<bool>, instructions: &Vec<Instruction>, point: &mut Point<i32>) {
+fn calculate_area(points: &Vec<Point<i32>>) -> f64 {
+	let mut coordinates: Vec<Coord> = vec!();
+	for point in points {
+		coordinates.push(coord! {x: point.0 as f64, y: point.1 as f64 });
+	}
+	let line_string = LineString::new(coordinates);
+	let polygon = Polygon::new(line_string, Vec::new());
+	polygon.unsigned_area()
+}
+
+fn compute_from_instructions(instructions: &Vec<Instruction>) -> i64 {
+	let mut points: Vec<Point<i32>> = vec!();
+	let mut point: Point<i32> = (0,0);
+	let mut b: i64 = 0;
 	for instruction in instructions {
-		grid[point.0 as usize][point.1 as usize] = true;
-		let tmp = step(&instruction, &point);
-		for i in point.0 .. tmp.0 {
-			grid[i as usize][point.1 as usize] = true;
-		}
-		for i in tmp.0 .. point.0 {
-			grid[i as usize][point.1 as usize] = true;
-		}
-		for i in point.1 .. tmp.1 {
-			grid[point.0 as usize][i as usize] = true;
-		}
-		for i in tmp.1 .. point.1 {
-			grid[point.0 as usize][i as usize] = true;
-		}
-		*point = (tmp.0, tmp.1);
+		points.push(point);
+		point = step(instruction, &mut point);
+		b += instruction.1 as i64;
 	}
+	let area = calculate_area(&points) as i64;
+	2 + b + (area - b/2 - 1)
 }
 
-fn flood_fill(grid: &mut Grid<bool>, point: Point<usize>) {
-	if point.0 >= grid.len() || point.1 >= grid[point.0].len() {
-		return;
-	}
-	if grid[point.0][point.1] {
-		return;
-	}
-
-	grid[point.0][point.1] = true;
-	flood_fill(grid, (point.0 + 1, point.1));
-	flood_fill(grid, (point.0 - 1, point.1));
-	flood_fill(grid, (point.0, point.1 - 1));
-	flood_fill(grid, (point.0, point.1 + 1));
-}
-
-fn compute_space(grid: &Grid<bool>) -> i64 {
-	let mut total: i64 = 0;
-	for line in grid {
-		for cell in line {
-			if *cell {
-				total += 1;
-			}
-		}
-	}
-	total
-}
-
-fn print(grid: &Grid<bool>){
-	for line in grid {
-		for c in line {
-			if *c {
-				print!("#");
-			}
-			else {
-				print!(".");
-			}
-		}
-		println!();
-	}
+fn parse_string(string: &str) -> Instruction {
+	let len: usize = string.len() - 2;
+	let hex_string = &string[2 .. len];
+	let num = i32::from_str_radix(&hex_string, 16).unwrap();
+	(string.chars().nth(len).unwrap(), num)
 }
 
 fn part1(){
-	let instructions = read_file("INPUT");
-	let mut point: Point<i32> = (0,0);
-	let mut min = point;
-	let mut max = point;
-	for instruction in &instructions {
-		point = step(&instruction, &mut point);
-		min = (if point.0 < min.0 { point.0 } else { min.0 },
-		       if point.1 < min.1 { point.1 } else { min.1 });
-		max = (if point.0 > max.0 { point.0 } else { max.0 },
-		       if point.1 > max.1 { point.1 } else { max.1 });
-	}
-	let mut grid: Grid<bool> = vec![vec![false; (max.1 - min.1 + 1) as usize]; (max.0 - min.0 + 1) as usize];
-	outline(&mut grid, &instructions, &mut (-min.0, -min.1));
-	flood_fill(&mut grid, (13, 180));
-	println!("Part 1: {}", compute_space(&grid));
+	let (instructions, _) = read_file("INPUT");
+	println!("Part 1: {}", compute_from_instructions(&instructions));
 }
 
 fn part2(){
-	println!("Part 2: {}", 0);
+	let (_, strings) = read_file("INPUT");
+	let instructions: Vec<Instruction> = strings.into_iter()
+	                                            .map(|string| { parse_string(&string) })
+	                                            .collect();
+	println!("Part 2: {}", compute_from_instructions(&instructions));
 }
 
 fn main() {
