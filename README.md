@@ -6,5 +6,5 @@ This repo is separated firstly by years, then by days. Always inputs are read fr
 
 ### Scripts
 
-- `page.sh` Is for generating pages for jekyll.
+- `page.sh` Is for generating pages for jekyll. Also takes one optional argument where to copy the generated files.
 - `template.sh` Is for creating the same rust template for other days. At least name of the problem must be set as the first argument. If there are three arguments the second is for year and the third for day. Otherwise take sys date.

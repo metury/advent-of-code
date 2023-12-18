@@ -126,3 +126,9 @@ for dir in *; do
 		cd ..
 	fi
 done
+
+if [ $# -gt 0 ]; then
+	cp -r "$aoc_dir" "$1"
+	cp "$aoc_file" "$1"
+	exit
+fi
