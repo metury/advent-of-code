@@ -43,7 +43,7 @@ permalink: $link$1/
 has_children: true
 ---
 
-This contains tasks from the year $dir.
+This contains tasks from the [year $1](https://adventofcode.com/$1).
 
 ### Days
 " > ../"$aoc_dir"/"$1".md
@@ -51,15 +51,16 @@ This contains tasks from the year $dir.
 
 # Print day by its number and number of year.
 print_day(){
+	real_day=${1#0}
 	echo "---
 layout: page
-title: Day $1
+title: Day $real_day
 parent: Year $2
 grand_parent: $aoc
 permalink: $link$2/$1/
 ---
 
-This is a solution of the day $1.
+This is a solution of the [day $real_day](https://adventofcode.com/$dir/day/$real_day).
 " > "$3"
 }
 
