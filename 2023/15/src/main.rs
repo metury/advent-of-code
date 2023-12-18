@@ -95,6 +95,7 @@ fn part2(){
 }
 
 fn main() {
+	println!("Year 2023 day 15 - Lens Library");
 	part1();
 	part2();
 }
