@@ -127,21 +127,10 @@ fn read_file(filepath: &str) -> (HashMap<String, State>, Vec<Part>) {
 			hash_map.insert(string, state);
 		}
 		else {
-			let part = parse_part(line);
-			parts.push(part);
+			parts.push(parse_part(line));
 		}
 	}
 	(hash_map, parts)
-}
-
-fn process_one(processed: bool, rule: Rule, ret: i64) -> (bool, i64, String) {
-	if rule.accepting {
-		return (true, ret, "".to_string());
-	}
-	else if rule.rejecting {
-		return (true, 0, "".to_string());
-	}
-	(false, 0, rule.next_state)
 }
 
 fn process_part(hash_map: &HashMap<String, State>, part: Part) -> i64 {
