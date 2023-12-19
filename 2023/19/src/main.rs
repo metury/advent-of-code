@@ -25,9 +25,7 @@ struct Rule {
 	rejecting: bool,
 }
 
-struct State {
-	rules: Vec<Rule>,
-}
+type State = Vec<Rule>;
 
 fn parse_rule(line: &str) -> Rule {
 	let splitted = line.split(':');
@@ -49,7 +47,7 @@ fn parse_rule(line: &str) -> Rule {
 	}
 	let binding = parts[0].to_string();
 	let considering = binding.chars().nth(0).unwrap();
-	let mut compare: Compare;
+	let compare: Compare;
 	match binding.chars().nth(1).unwrap() {
 		'<' => compare = Compare::LessThan,
 		'>' => compare = Compare::MoreThan,
@@ -80,8 +78,26 @@ fn parse_state(line: &str) -> (String, State) {
 	for r in rule.split(',') {
 		rules.push(parse_rule(r));
 	}
-	println!("String {} and rules {:?}", string, rules);
-	(string, State{rules: rules})
+	(string, rules)
+}
+
+fn parse_part(line: &str) -> Part {
+	let interior = &line[1 .. line.len() - 1];
+	let values: Vec<&str> = interior.split(',').collect();
+	let mut x: i64 = 0;
+	let mut a: i64 = 0;
+	let mut s: i64 = 0;
+	let mut m: i64 = 0;
+	for val in values {
+		match val.chars().nth(0).unwrap() {
+			'x' => x = i64::from_str_radix(&val[2 ..], 10).unwrap(),
+			'a' => a = i64::from_str_radix(&val[2 ..], 10).unwrap(),
+			's' => s = i64::from_str_radix(&val[2 ..], 10).unwrap(),
+			'm' => m = i64::from_str_radix(&val[2 ..], 10).unwrap(),
+			 _  => todo!(),
+		 }
+	 }
+	 Part {x: x, a: a, s: s, m: m}
 }
 
 fn read_file(filepath: &str) -> (HashMap<String, State>, Vec<Part>) {
@@ -96,18 +112,149 @@ fn read_file(filepath: &str) -> (HashMap<String, State>, Vec<Part>) {
 			first_part = false;
 		}
 		else if first_part {
-			parse_state(&line);
+			let (string, state) = parse_state(&line);
+			hash_map.insert(string, state);
 		}
 		else {
-			// Parse Part.
+			let part = parse_part(line);
+			parts.push(part);
 		}
 	}
 	(hash_map, parts)
 }
 
+fn process_part(hash_map: &HashMap<String, State>, part: Part) -> i64 {
+	let mut string = "in";
+	let ret = part.x + part.a + part.s + part.m;
+	loop {
+		let state = &hash_map[string];
+		for rule in state {
+			match rule.compare {
+				Compare::LessThan => {
+					match rule.considering {
+						'x' => {
+							if part.x < rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						}
+						'a' => {
+							if part.a < rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						}
+						's' => {
+							if part.s < rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						}
+						'm' => {
+							if part.m < rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						},
+						_ => todo!(),
+					}
+				}
+				Compare::MoreThan => {
+					match rule.considering {
+						'x' => {
+							if part.x > rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						}
+						'a' => {
+							if part.a > rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						}
+						's' => {
+							if part.s > rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						}
+						'm' => {
+							if part.m > rule.number {
+								if rule.accepting {
+									return ret;
+								}
+								else if rule.rejecting {
+									return 0;
+								}
+								string = &rule.next_state;
+								break;
+							}
+						},
+						_ => todo!(),
+					}
+				}
+				Compare::True => {
+					if rule.accepting {
+						return ret;
+					}
+					else if rule.rejecting {
+						return 0;
+					}
+					string = &rule.next_state;
+					break;
+				}
+			}
+		}
+	}
+}
+
 fn part1() {
-	read_file("INPUT");
-	println!("Part 1: {}", 0);
+	let (hash_map, parts) = read_file("INPUT");
+	let results: Vec<i64> = parts.into_iter().map(|p| process_part(&hash_map, p)).collect();
+	println!("Part 1: {}", results.iter().sum::<i64>());
 }
 
 fn part2() {
