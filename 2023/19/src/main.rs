@@ -8,6 +8,17 @@ struct Part {
 	s: i64,
 }
 
+struct BoundPart {
+	x_l: i64,
+	x_h: i64,
+	m_l: i64,
+	m_h: i64,
+	a_l: i64,
+	a_h: i64,
+	s_l: i64,
+	s_h: i64,
+}
+
 #[derive(Debug)]
 enum Compare {
 	LessThan,
@@ -123,9 +134,19 @@ fn read_file(filepath: &str) -> (HashMap<String, State>, Vec<Part>) {
 	(hash_map, parts)
 }
 
+fn process_one(processed: bool, rule: Rule, ret: i64) -> (bool, i64, String) {
+	if rule.accepting {
+		return (true, ret, "".to_string());
+	}
+	else if rule.rejecting {
+		return (true, 0, "".to_string());
+	}
+	(false, 0, rule.next_state)
+}
+
 fn process_part(hash_map: &HashMap<String, State>, part: Part) -> i64 {
 	let mut string = "in";
-	let ret = part.x + part.a + part.s + part.m;
+	let ret: i64 = part.x + part.a + part.s + part.m;
 	loop {
 		let state = &hash_map[string];
 		for rule in state {
@@ -251,6 +272,10 @@ fn process_part(hash_map: &HashMap<String, State>, part: Part) -> i64 {
 	}
 }
 
+fn process_bounds(hash_map: &HashMap<String, State>, bounds: BoundPart) -> i64 {
+	return 0;
+}
+
 fn part1() {
 	let (hash_map, parts) = read_file("INPUT");
 	let results: Vec<i64> = parts.into_iter().map(|p| process_part(&hash_map, p)).collect();
@@ -258,6 +283,7 @@ fn part1() {
 }
 
 fn part2() {
+	let (hash_map, _) = read_file("INPUT");
 	println!("Part 2: {}", 0);
 }
 
