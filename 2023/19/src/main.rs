@@ -35,7 +35,7 @@ fn get_considering(c: char) -> usize {
 		'm' => return M,
 		'a' => return A,
 		's' => return S,
-		 _  => return 5,
+		 _  => return INV,
 	 }
  }
 
