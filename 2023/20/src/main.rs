@@ -220,6 +220,7 @@ fn part2() {
 	let mut tree = create_rx_tree(&mut hash_map);
 	let mut counter: i64 = 0;
 	while bfs_last(&mut tree) != 1 {
+		println!("{}", counter);
 		counter += 1;
 	}
 	println!("Part 2: {}", counter);
