@@ -43,7 +43,11 @@ fn parse_node(line: &str) -> Node {
 		name = parts[0].to_string();
 	}
 	let next_nodes: Vec<String> = parts[1].split(", ").map(|n| n.to_string()).collect();
-	Node {name: name, node_type: node_type, on: false, next_nodes: next_nodes, predecessors: HashMap::new()}
+	Node {name: name,
+		node_type: node_type,
+		on: false,
+		next_nodes: next_nodes,
+		predecessors: HashMap::new()}
 }
 
 fn read_file(filepath: &str) -> HashMap<String, Node> {
@@ -58,7 +62,12 @@ fn read_file(filepath: &str) -> HashMap<String, Node> {
 			hash_map.insert(name.to_string(), node);
 		}
 	}
-	hash_map.insert(RX.to_string(), Node { name: RX.to_string(), node_type: NodeType::Broadcast, on: false, next_nodes: vec!(), predecessors: HashMap::new()});
+	hash_map.insert(RX.to_string(), Node {
+		name: RX.to_string(),
+		node_type: NodeType::Broadcast,
+		on: false,
+		next_nodes: vec!(),
+		predecessors: HashMap::new()});
 	return hash_map;
 }
 
@@ -217,7 +226,8 @@ fn part1() {
 fn part2() {
 	let hash_map = read_file("INPUT");
 	create_graphviz(&hash_map, "graph.dot");
-	let vec: Vec<u64> = [2, 3, 4, 6, 8, 9, 10, 11, 12, 13, 14].to_vec();
+	// This is actually only my result.
+	let vec: Vec<u64> = [0b111111010011, 0b111100000111, 0b111100100101, 0b11101101010101].to_vec();
 	println!("Part 2: {}", lcm_vec(&vec));
 }
 
