@@ -5,3 +5,5 @@ aoc/
 adventofcode.md
 target/
 *.lock
+*.dot
+*.png
