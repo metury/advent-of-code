@@ -110,7 +110,10 @@ fn part2() {
 					.count())
 				.fold(0, |acc, sum| acc + sum);
 	
-	let total = (n+1)*(n+1) * full_odd + n*n * full_even - (n+1) * corner_odd + n * corner_even;
+	let total = (n+1)*(n+1) * full_odd
+			+ n*n * full_even
+			- (n+1) * corner_odd
+			+ n * corner_even;
 	println!("Part 2: {}", total);
 }
 
