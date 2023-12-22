@@ -1,11 +1,13 @@
 use std::fs;
 use std::collections::HashSet;
 
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug)]
 struct Brick {
 	x: (i64, i64),
 	y: (i64, i64),
 	z: (i64, i64),
+	supports: HashSet<usize>,
+	supported_by: HashSet<usize>,
 }
 
 fn parse_numbers(line: &str) -> (i64, i64, i64) {
@@ -21,7 +23,9 @@ fn parse_brick(line: &str) -> Brick {
 	let (x2, y2, z2) = parse_numbers(parts[1]);
 	Brick { x: (x1, x2),
 		    y: (y1, y2),
-		    z: (z1, z2),}
+		    z: (z1, z2),
+		    supported_by: HashSet::new(),
+		    supports: HashSet::new()}
 }
 
 fn read_file(filepath: &str) -> Vec<Brick> {
@@ -44,8 +48,8 @@ fn overlap(b1: &Brick, b2: &Brick) -> bool {
 fn compress_bricks(bricks: &mut Vec<Brick>) {
 	for i in 0 .. bricks.len() {
 		let mut max: i64 = 0;
-		for j in 0 .. bricks.len() {
-			if bricks[j].z.1 > max && bricks[j].z.1 < bricks[i].z.0 && overlap(&bricks[i], &bricks[j]) {
+		for j in 0 .. i {
+			if bricks[j].z.1 > max && overlap(&bricks[i], &bricks[j]) {
 				max = bricks[j].z.1;
 			}
 		}
@@ -55,26 +59,23 @@ fn compress_bricks(bricks: &mut Vec<Brick>) {
 	}
 }
 
-fn count_overlaps(bricks: &Vec<Brick>) -> usize {
+fn count_overlaps(bricks: &mut Vec<Brick>) -> usize {
 	let mut set: HashSet<usize> = HashSet::new();
-	let mut overlaps: bool;
 	for i in 0 .. bricks.len() {
-		let mut curr_set: HashSet<usize> = HashSet::new();
-		overlaps = false;
 		for j in 0 .. bricks.len() {
 			if bricks[j].z.1 == bricks[i].z.0 - 1 && overlap(&bricks[i], &bricks[j]) {
-				curr_set.insert(j);
+				bricks[i].supported_by.insert(j);
 			}
 			if bricks[i].z.1 + 1 == bricks[j].z.0 && overlap(&bricks[i], &bricks[j]) {
-				overlaps = true;
+				bricks[i].supports.insert(j);
 			}
 		}
-		if curr_set.len() >= 2 {
-			for k in curr_set {
-				set.insert(k);
+		if bricks[i].supported_by.len() > 1 {
+			for s in &bricks[i].supported_by {
+				set.insert(*s);
 			}
 		}
-		if !overlaps {
+		if bricks[i].supports.len() == 0 {
 			set.insert(i);
 		}
 	}
@@ -83,9 +84,9 @@ fn count_overlaps(bricks: &Vec<Brick>) -> usize {
 
 fn part1() {
 	let mut bricks = read_file("INPUT");
-	bricks.sort_by(|a, b| a.z.0.cmp(&b.z.0));
+	bricks.sort_by(|a, b| a.z.cmp(&b.z));
 	compress_bricks(&mut bricks);
-	println!("Part 1: {}", count_overlaps(&bricks));
+	println!("Part 1: {}", count_overlaps(&mut bricks));
 }
 
 fn part2() {
