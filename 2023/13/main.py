@@ -52,5 +52,6 @@ def find_mirror(smudges):
 		total += compute(matrix, smudges)
 		return total
 
-print(f"First part: {find_mirror(False)}")
-print(f"Second part: {find_mirror(True)}")
+if __name__ == "__main__":
+	print(f"First part: {find_mirror(False)}")
+	print(f"Second part: {find_mirror(True)}")
