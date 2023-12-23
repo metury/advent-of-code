@@ -43,7 +43,7 @@ permalink: $link$1/
 has_children: true
 ---
 
-This contains tasks from the [year $1](https://adventofcode.com/$1).
+This contains tasks from the [year $1](https://adventofcode.com/$1). Go back to [AOC]($link).
 
 ### Days
 " > ../"$aoc_dir"/"$1".md
@@ -60,7 +60,7 @@ grand_parent: $aoc
 permalink: $link$2/$1/
 ---
 
-This is a solution of the [day $real_day](https://adventofcode.com/$dir/day/$real_day).
+This is a solution of the [day $real_day](https://adventofcode.com/$dir/day/$real_day). Go back to year [$2]($link$2). Go back to [AOC]($link).
 " > "$3"
 }
 
