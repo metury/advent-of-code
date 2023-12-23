@@ -1,7 +1,6 @@
 use std::fs;
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap, VecDeque};
 
-#[derive(Debug)]
 struct Brick {
 	x: (i64, i64),
 	y: (i64, i64),
@@ -59,8 +58,7 @@ fn compress_bricks(bricks: &mut Vec<Brick>) {
 	}
 }
 
-fn count_overlaps(bricks: &mut Vec<Brick>) -> usize {
-	let mut set: HashSet<usize> = HashSet::new();
+fn create_supports(bricks: &mut Vec<Brick>) {
 	for i in 0 .. bricks.len() {
 		for j in 0 .. bricks.len() {
 			if bricks[j].z.1 == bricks[i].z.0 - 1 && overlap(&bricks[i], &bricks[j]) {
@@ -70,27 +68,70 @@ fn count_overlaps(bricks: &mut Vec<Brick>) -> usize {
 				bricks[i].supports.insert(j);
 			}
 		}
+	}
+}
+
+fn count_overlaps(bricks: &mut Vec<Brick>) -> usize {
+	let mut hash_map: HashMap<usize, bool> = HashMap::new();
+	for i in 0 .. bricks.len() {
 		if bricks[i].supported_by.len() > 1 {
 			for s in &bricks[i].supported_by {
-				set.insert(*s);
+				if !hash_map.contains_key(s) {
+					hash_map.insert(*s, true);
+				}
+			}
+		}
+		else {
+			for s in &bricks[i].supported_by {
+				hash_map.insert(*s, false);
 			}
 		}
 		if bricks[i].supports.len() == 0 {
-			set.insert(i);
+			if !hash_map.contains_key(&i) {
+				hash_map.insert(i, true);
+			}
 		}
 	}
-	set.len()
+	hash_map.into_iter().filter(|a| a.1).count()
+}
+
+fn count_disintegration(bricks: &Vec<Brick>) -> usize {
+	let mut total: usize = 0;
+	for i in 0 .. bricks.len() {
+		let mut set: HashSet<usize> = HashSet::new();
+		let mut queue: VecDeque<usize> = VecDeque::new();
+		set.insert(i);
+		queue.push_back(i);
+		while !queue.is_empty() {
+			let brick = queue.pop_front().unwrap();
+			for b in &bricks[brick].supports {
+				if set.intersection(&bricks[*b].supported_by).count() == bricks[*b].supported_by.len() {
+					if !set.contains(b) {
+						queue.push_back(*b);
+						set.insert(*b);
+					}
+				}
+			}
+		}
+		total += set.len() - 1;
+	}
+	total
 }
 
 fn part1() {
 	let mut bricks = read_file("INPUT");
 	bricks.sort_by(|a, b| a.z.cmp(&b.z));
 	compress_bricks(&mut bricks);
+	create_supports(&mut bricks);
 	println!("Part 1: {}", count_overlaps(&mut bricks));
 }
 
 fn part2() {
-	println!("Part 2: {}", 0);
+	let mut bricks = read_file("INPUT");
+	bricks.sort_by(|a, b| a.z.cmp(&b.z));
+	compress_bricks(&mut bricks);
+	create_supports(&mut bricks);
+	println!("Part 2: {}", count_disintegration(&bricks));
 }
 
 fn main() {
