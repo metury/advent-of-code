@@ -1,20 +1,19 @@
 use std::fs;
-use good_lp::{variables, variable, default_solver, SolverModel, Solution};
 
 #[derive(Debug)]
 struct HailStone {
-	x: f64,
-	y: f64,
-	z: f64,
-	x_shift: f64,
-	y_shift: f64,
-	z_shift: f64,
+	x: i64,
+	y: i64,
+	z: i64,
+	x_shift: i64,
+	y_shift: i64,
+	z_shift: i64,
 }
 
 fn parse_hail_stone(line: &str) -> HailStone {
 	let pos_vel: Vec<&str> = line.split(" @ ").collect();
-	let pos: Vec<f64> = pos_vel[0].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap() as f64).collect();
-	let vel: Vec<f64> = pos_vel[1].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap() as f64).collect();
+	let pos: Vec<i64> = pos_vel[0].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap()).collect();
+	let vel: Vec<i64> = pos_vel[1].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap()).collect();
 	HailStone {
 		x: pos[0],
 		y: pos[1],
@@ -39,26 +38,23 @@ fn read_file(filepath: &str) -> Vec<HailStone> {
 }
 
 fn colission(hs1: &HailStone, hs2: &HailStone, limits: (f64, f64)) -> bool {
-	variables!{
-		vars:
-			t;
-			7 <= x <= 27;
-			7 <= y <= 27;
+	// Matrix a1 a2 = c1
+	//        b1 b2 = c2
+	let a1 = -hs1.x_shift as f64;
+	let a2 = hs2.x_shift as f64;
+	let b1 = -hs1.y_shift as f64;
+	let b2 = hs2.y_shift as f64;
+	let c1 = (hs1.x - hs2.x) as f64;
+	let c2 = (hs1.y - hs2.y) as f64;
+	let det = a1 * b2 - a2 * b1;
+	if det == 0.0 {
+		return false;
+	} else {
+		let s = (c1 * b2 - c2 * a2) / det;
+		let t = (a1 * c2 - b1 * c1) / det;
+		let point = (hs1.x as f64 + hs1.x_shift as f64 * s, hs1.y as f64 + hs1.y_shift as f64 * s);
+		return point.0 >= limits.0 && point.0 <= limits.1 && point.1 >= limits.0 && point.1 <= limits.1 && s >= 0.0 && t >= 0.0;
 	}
-	let solution = vars.maximise(t)
-		.using(default_solver)
-		.with(x << hs1.x_shift + t * hs1.x_shift )
-		.with(hs1.x_shift + t * hs1.x_shift << x)
-		.with(x << hs2.x_shift + t * hs2.x_shift )
-		.with(hs2.x_shift + t * hs2.x_shift << x)
-		.with(y << hs1.y_shift + t * hs1.y_shift )
-		.with(hs2.y_shift + t * hs2.y_shift << y)
-		.solve();
-	match solution {
-		Ok (solution) => println!("{} {}", solution.value(x), solution.value(y)),
-		Err (..) => return false,
-	}
-	true
 }
 
 fn number_of_collisions(hail_stones: &Vec<HailStone>, limits: (f64, f64)) -> u64 {
@@ -75,7 +71,7 @@ fn number_of_collisions(hail_stones: &Vec<HailStone>, limits: (f64, f64)) -> u64
 
 fn part1() {
 	let hail_stones = read_file("INPUT");
-	println!("Part 1: {}", number_of_collisions(&hail_stones, (7.0, 27.0)));
+	println!("Part 1: {}", number_of_collisions(&hail_stones, (200_000_000_000_000.0, 400_000_000_000_000.0)));
 }
 
 fn part2() {
