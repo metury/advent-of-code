@@ -1,26 +1,27 @@
 use std::fs;
 
-#[derive(Debug)]
+const EPSILON: f64 = 0.0001;
+
 struct HailStone {
-	x: i64,
-	y: i64,
-	z: i64,
-	x_shift: i64,
-	y_shift: i64,
-	z_shift: i64,
+	x: f64,
+	y: f64,
+	z: f64,
+	xv: f64,
+	yv: f64,
+	zv: f64,
 }
 
 fn parse_hail_stone(line: &str) -> HailStone {
 	let pos_vel: Vec<&str> = line.split(" @ ").collect();
-	let pos: Vec<i64> = pos_vel[0].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap()).collect();
-	let vel: Vec<i64> = pos_vel[1].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap()).collect();
+	let pos: Vec<f64> = pos_vel[0].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap() as f64).collect();
+	let vel: Vec<f64> = pos_vel[1].split(", ").map(|x| i64::from_str_radix(x, 10).unwrap() as f64).collect();
 	HailStone {
 		x: pos[0],
 		y: pos[1],
 		z: pos[2],
-		x_shift: vel[0],
-		y_shift: vel[1],
-		z_shift: vel[2],
+		xv: vel[0],
+		yv: vel[1],
+		zv: vel[2],
 	}
 }
 
@@ -38,22 +39,14 @@ fn read_file(filepath: &str) -> Vec<HailStone> {
 }
 
 fn colission(hs1: &HailStone, hs2: &HailStone, limits: (f64, f64)) -> bool {
-	// Matrix a1 a2 = c1
-	//        b1 b2 = c2
-	let a1 = -hs1.x_shift as f64;
-	let a2 = hs2.x_shift as f64;
-	let b1 = -hs1.y_shift as f64;
-	let b2 = hs2.y_shift as f64;
-	let c1 = (hs1.x - hs2.x) as f64;
-	let c2 = (hs1.y - hs2.y) as f64;
-	let det = a1 * b2 - a2 * b1;
+	let det = (-hs1.xv) * hs2.yv - hs2.xv * (-hs1.yv);
 	if det == 0.0 {
 		return false;
 	} else {
-		let s = (c1 * b2 - c2 * a2) / det;
-		let t = (a1 * c2 - b1 * c1) / det;
-		let point = (hs1.x as f64 + hs1.x_shift as f64 * s, hs1.y as f64 + hs1.y_shift as f64 * s);
-		return point.0 >= limits.0 && point.0 <= limits.1 && point.1 >= limits.0 && point.1 <= limits.1 && s >= 0.0 && t >= 0.0;
+		let time1 = ((hs1.x - hs2.x) * hs2.yv - (hs1.y - hs2.y) * hs2.xv) / det;
+		let time2 = ((-hs1.xv) * (hs1.y - hs2.y) - (-hs1.yv) * (hs1.x - hs2.x)) / det;
+		let point = (hs1.x + hs1.xv * time1, hs1.y + hs1.yv * time1);
+		return point.0 >= limits.0 && point.0 <= limits.1 && point.1 >= limits.0 && point.1 <= limits.1 && time1 >= 0.0 && time2 >= 0.0;
 	}
 }
 
@@ -69,13 +62,61 @@ fn number_of_collisions(hail_stones: &Vec<HailStone>, limits: (f64, f64)) -> u64
 	total
 }
 
+
+fn solve_part2(h1: &HailStone, h2: &HailStone, vx: f64, vy: f64, vz: f64) -> Option<(f64, f64, (f64, f64, f64))> {
+	let t2_numerator = h2.y - h1.y - (((h1.yv - vy) * (h2.x - h1.x)) / (h1.xv - vx));
+	let t2_denominator = vy - h2.yv - (((h1.yv - vy) * (vx - h2.xv)) / (h1.xv - vx));
+	let t2 = t2_numerator / t2_denominator;
+	let t1 = (h2.x - h1.x - t2 * (vx - h2.xv)) / (h1.xv - vx);
+	let px = h1.x - t1 * (vx - h1.xv);
+	let py = h1.y - t1 * (vy - h1.yv);
+	let pz = h1.z - t1 * (vz - h1.zv);
+	if (pz + t2 * (vz - h2.zv) - h2.z).abs() > EPSILON {
+		None
+	} else {
+		Some((t1, t2,(px, py, pz)))
+	}
+}
+fn perfect_shot(hail_stones: &Vec<HailStone>) -> usize {
+	let a = &hail_stones[0];
+	let b = &hail_stones[1];
+	let is_int = |f: f64| (f.round() - f).abs() < EPSILON;
+	for vx in -500..500 {
+		for vy in -500..500 {
+			'outer: for vz in -500..500 {
+				let vx = vx as f64;
+				let vy = vy as f64;
+				let vz = vz as f64;
+				if let Some((t1, t2, (px, py, pz))) = solve_part2(&a, &b, vx, vy, vz) {
+					if (!(t1.is_finite() && t2.is_finite() && px.is_finite() && py.is_finite() && pz.is_finite()))
+					   || (t1.is_sign_negative() || t2.is_sign_negative())
+					   || (!(is_int(t1) && is_int(t2) && is_int(px) && is_int(py) && is_int(pz))){
+						continue;
+					}
+					for i in 2 .. hail_stones.len() {
+						let h = &hail_stones[i];
+						let t3 = (h.x - px) / (vx - h.xv);
+						if (py + t3 * vy - (h.y + t3 * h.yv)).abs() > EPSILON
+							|| (pz + t3 * vz - (h.z + t3 * h.zv)).abs() > EPSILON {
+							continue 'outer;
+						}
+						return px as usize + py as usize + pz as usize;
+					}
+				}
+			}
+		}
+	}
+	404
+}
+
 fn part1() {
 	let hail_stones = read_file("INPUT");
 	println!("Part 1: {}", number_of_collisions(&hail_stones, (200_000_000_000_000.0, 400_000_000_000_000.0)));
 }
 
 fn part2() {
-	println!("Part 2: {}", 0);
+	let hail_stones = read_file("INPUT");
+	println!("Part 2: {}", perfect_shot(&hail_stones));
 }
 
 fn main() {
