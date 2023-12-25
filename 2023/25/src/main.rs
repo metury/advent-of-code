@@ -1,6 +1,9 @@
 use std::fs;
 use std::collections::{HashMap, HashSet, VecDeque};
 use rand::random;
+use std::io::Write;
+
+const PAIRS: [(&str, &str); 3] = [("dlv", "tqh"), ("ngp", "bmd"), ("tqr", "grd")];
 
 #[derive(Debug, Clone)]
 struct Vertex {
@@ -40,8 +43,14 @@ fn parse_wire(line: &str, indexing: &mut u64, indexes: &mut HashMap<String, u64>
 			graph.vertex_size += 1;
 			*indexing += 1;
 		}
-		graph.edges.push(MultiEdge {id_from: indexes[start], id_to: indexes[t], counter: 1});
-		graph.edge_size += 1;
+		let mut add = false;
+		for p in PAIRS {
+			add |= (start == p.0 && t == p.1) || (start == p.1 && t == p.0);
+		}
+		if !add {
+			graph.edges.push(MultiEdge {id_from: indexes[start], id_to: indexes[t], counter: 1});
+			graph.edge_size += 1;
+		}
 	}
 }
 
@@ -132,10 +141,16 @@ fn is_connected(graph: &mut Graph) -> bool {
 	while !queue.is_empty() {
 		let id = queue.pop_front().unwrap();
 		for e in &graph.edges {
-			if e.id_from == id || e.id_to == id {
-				if !found.contains(&id) {
-					found.insert(id);
-					queue.push_back(id);
+			if e.id_from == id {
+				if !found.contains(&e.id_to) {
+					found.insert(e.id_to);
+					queue.push_back(e.id_to);
+				}
+			}
+			if e.id_to == id {
+				if !found.contains(&e.id_from) {
+					found.insert(e.id_from);
+					queue.push_back(e.id_from);
 				}
 			}
 		}
@@ -156,10 +171,16 @@ fn partitions(graph: &Graph) -> u64 {
 	while !queue.is_empty() {
 		let id = queue.pop_front().unwrap();
 		for e in &graph.edges {
-			if e.id_from == id || e.id_to == id {
-				if !found.contains(&id) {
-					found.insert(id);
-					queue.push_back(id);
+			if e.id_from == id {
+				if !found.contains(&e.id_to) {
+					found.insert(e.id_to);
+					queue.push_back(e.id_to);
+				}
+			}
+			if e.id_to == id {
+				if !found.contains(&e.id_from) {
+					found.insert(e.id_from);
+					queue.push_back(e.id_from);
 				}
 			}
 		}
@@ -173,7 +194,7 @@ fn partitions(graph: &Graph) -> u64 {
 			sum2 += v.1.counter;
 		}
 	}
-	sum1 * sum2
+	(found.len() * (graph.vertices.len() - found.len())) as u64
 }
 
 fn bruteforce(graph: &mut Graph, h: &mut Graph, min: &mut u64, size: u64) {
@@ -215,15 +236,43 @@ fn karger_stein(graph: &mut Graph) -> (u64, u64) {
 	}
 }
 
+fn create_graphviz(input: &str, filepath: &str) {
+	let file = fs::File::create(filepath);
+	match writeln!(file.as_ref().expect("REASON"), "{}", "graph AOC {") {
+		Ok(()) => {},
+		Err(..) => return,
+	}
+	let contents = fs::read_to_string(input);
+	let binding = contents.expect("REASON");
+	let lines = binding.split('\n');
+	for line in lines{
+		if line != "" {
+			let from_to: Vec<&str> = line.split(": ").collect();
+			let from = from_to[0];
+			let parts: Vec<&str> = from_to[1].split(' ').collect();
+			for p in parts {
+				match writeln!(file.as_ref().expect("REASON"), "{}", format!("	{} -- {};", from, p)) {
+				Ok(()) => {},
+				Err(..) => return,
+				}
+			}
+		}
+	}
+	match writeln!(file.as_ref().expect("REASON"), "{}", "}") {
+		Ok(()) => {},
+		Err(..) => return,
+	}
+}
+
 fn part1() {
 	let mut graph = read_file("INPUT");
-	let (min, ans) = karger_stein(&mut graph);
-	println!("{} {}", min, ans);
-	println!("Part 1: {}", ans);
+	create_graphviz("INPUT", "graph.dot");
+	//karger_stein(&mut graph);
+	println!("Part 1: {}", partitions(&graph));
 }
 
 fn part2() {
-	println!("Part 2: {}", 0);
+	println!("Part 2: {}", "Push the red button.");
 }
 
 fn main() {
