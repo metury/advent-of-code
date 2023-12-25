@@ -229,7 +229,7 @@ fn part2() {
 	// This is actually only my result.
 	let vec: Vec<u64> = [0b111111010011, 0b111100000111, 0b111100100101, 0b111011010101].to_vec();
 	println!("This is just my solution, yours can be found by looking at the graph in graph.dot.");
-	println!("Try running: dot -Tpng graph.dot -o graph.png to see the graph.");
+	println!("Try running: dot -Kdot -Tsvg graph.dot -o graph.svg to see the graph.");
 	println!("Simply create binary numbers for each module; 1 if it goes in and 0 otherwise.");
 	println!("Part 2: {}", lcm_vec(&vec));
 }
