@@ -10,7 +10,7 @@ aoc="advent of code"
 link="/aoc/"
 aoc_dir="aoc"
 aoc_file="adventofcode.md"
-forbidden_files="INPUT OUTPUT Cargo.toml Cargo.lock info.md main graph.dot graph.png"
+forbidden_files="INPUT OUTPUT Cargo.toml Cargo.lock info.md main graph.dot graph.png graph.svg"
 
 ## ==================== ##
 ##  Functions           ##
