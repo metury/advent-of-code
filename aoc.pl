@@ -59,9 +59,11 @@ sub print_day {
 # Print single file to the day.
 sub print_file {
 	my ($file, $output) = @_;
+	my $file_name = $file;
+	$file_name =~ s/^.*\///g;
 	open(FH, '>>', $output) or die $!;
-	print FH "## $file\n\n";
-	my @lang = split /\./, $file;
+	print FH "## $file_name\n\n";
+	my @lang = split /\./, $file_name;
 	print FH "\`\`\`$lang[1]\n";
 	open(IN, '<', $file) or die $!;
 	while (<IN>) {
@@ -75,7 +77,8 @@ sub print_file {
 mkdir "$aoc_dir";
 print_aoc($aoc_file);
 
-# Iterate over the content of foo/bar
+# Appending previous files is not inside.
+
 my $iter = $dir->iterator;
 while (my $year_dir = $iter->()) {
 	if ($year_dir->is_dir() and not $year_dir eq "aoc" and not $year_dir eq ".git") {
@@ -87,7 +90,23 @@ while (my $year_dir = $iter->()) {
 			print_day("$aoc_dir/$year_dir-$day.md", $year_dir, $day);
 			my $day_iter = $day_dir->iterator;
 			while (my $file = $day_iter->()) {
-				print_file($file, "$aoc_dir/$year_dir-$day.md");
+				if ($file->is_dir() and $file =~ /^.*\/src/) {
+					my $src_iter = $file->iterator;
+					while (my $src_file = $src_iter->()) {
+						my $src_file_name = $file;
+						$src_file_name =~ s/^.*\///g;
+						if (not grep {$_ eq $src_file_name} @forb) {
+							print_file($src_file, "$aoc_dir/$year_dir-$day.md");
+						}
+					}
+				}
+				elsif (not $file->is_dir()) {
+					my $file_name = $file;
+					$file_name =~ s/^.*\///g;
+					if (not grep {$_ eq $file_name} @forb) {
+						print_file($file, "$aoc_dir/$year_dir-$day.md");
+					}
+				}
 			}
 		}
 	}
