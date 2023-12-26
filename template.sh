@@ -33,15 +33,11 @@ cd "$day"/src/
 
 echo "use std::fs;
 
-fn read_file(filepath: &str) -> {
+fn read_file(filepath: &str) -> Vec<&str> {
 	let contents = fs::read_to_string(filepath);
 	let binding = contents.expect(\"REASON\");
-	let lines = binding.split('\n');
-	for line in lines{
-		for c in line.chars(){
-		}
-	}
-	return;
+	let lines: Vec<&str> = binding.split('\n').collect();
+	lines
 }
 
 fn part1() {

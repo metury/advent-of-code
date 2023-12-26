@@ -128,6 +128,10 @@ for dir in *; do
 	fi
 done
 
+## ==================== ##
+##  Copy the files      ##
+## ==================== ##
+
 if [ $# -gt 0 ]; then
 	cp -r "$aoc_dir" "$1"
 	cp "$aoc_file" "$1"
