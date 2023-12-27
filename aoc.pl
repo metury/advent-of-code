@@ -220,7 +220,7 @@ sub rust_template {
 	}
 	system("cargo", "new", "$year/aoc-$year-$day");
 	rename("$year/aoc-$year-$day", "$year/$written_day");
-	open(FH, '>', "$year/$written_day/src/main.rs");
+	open(FH, '>', "$year/$written_day/src/main.rs") or die $!;
 	print FH "use std::fs\n\n";
 	print FH "fn read_file(filepath: &str) -> Vec<&str> {\n";
 	print FH "\tlet contents = fs::read_to_string(filepath);\n";
@@ -245,7 +245,7 @@ sub python_template {
 		die "This project already exists.\n";
 	}
 	mkdir "$year/$written_day";
-	open(FH, '>', "$year/$written_day/main.py");
+	open(FH, '>', "$year/$written_day/main.py") or die $!;
 	print FH "#!/usr/bin/env python3\n\n";
 	print FH "def read_file(file):\n\twith open(file, 'r') as f:\n\t\tfor line in f:\n\t\t\tprint(line)\n\n";
 	print FH "def part1():\n\tprint(f\"Part 1: {0}\")\n\n";
@@ -318,7 +318,7 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 	}
 } elsif ($ARGV[0] eq "-g" or $ARGV[0] eq "--gitignore") {
 	print "🎄 Creating basic `.gitignore` file. 🎄\n";
-	open(FH, '>', ".gitignore");
+	open(FH, '>', ".gitignore") or die $!;
 	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n";
 	close(FH);
 }
