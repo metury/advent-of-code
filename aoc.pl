@@ -6,8 +6,6 @@ use Path::Tiny;
 my $dir = path('.');
 my $aoc = "advent of code";
 my $link = "/aoc/";
-my $aoc_dir = "aoc";
-my $aoc_file = "adventofcode.md";
 my @forb = ("INPUT", "OUTPUT", "Cargo.toml", "Cargo.lock", "info.md", "main", "graph.dot", "graph.png", "graph.svg");
 
 # Print main file of the aoc.
@@ -23,6 +21,14 @@ sub print_aoc {
 	print FH "They are my solutions to [advent of code](https://adventofcode.com/) tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.\n";
 	print FH "Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. Also you may consider joining [Reddit](https://www.reddit.com/r/adventofcode/) where you may find useful tips, or help someone.\n\n";
 	print FH "### Years\n\n";
+	close(FH);
+}
+
+# Append year to the aoc file.
+sub append_year {
+	my ($name, $year) = @_;
+	open(FH, '>>', $name) or die $!;
+	print FH "- [Year $year]($link$year)\n";
 	close(FH);
 }
 
@@ -42,6 +48,13 @@ sub print_year {
 	close(FH);
 }
 
+sub append_day {
+	my ($name, $year, $day) = @_;
+	open(FH, '>>', $name) or die $!;
+	print FH "- [Day $day]($link$year/$day/)\n";
+	close(FH);
+}
+
 # Print day file.
 sub print_day {
 	my ($name, $year, $day) = @_;
@@ -51,6 +64,7 @@ sub print_day {
 	print FH "title: Day $day\n";
 	print FH "parent: Year $year\n";
 	print FH "grand_parent: $aoc\n";
+	print FH "permalink: $link$year/$day/\n";
 	print FH "---\n\n";
 	print FH "This is a solution of the [day $day](https://adventofcode.com/$year/day/$day). Go back to year [$year]($link$year). Go back to [AOC]($link).\n\n";
 	close(FH);
@@ -70,44 +84,74 @@ sub print_file {
 		$_ =~ s/\t/  /g;
 		print FH $_;
 	}
-	print FH "\`\`\`\n";
+	print FH "\`\`\`\n\n";
 	close(FH);
 }
 
-mkdir "$aoc_dir";
-print_aoc($aoc_file);
+# Print info to the file.
+sub print_info {
+	my ($info_file, $output) = @_;
+	open(FH, '>>', $output) or die $!;
+	print FH "### Info\n\n";
+	open(IN, '<', $info_file) or die $!;
+	while (<IN>) {
+		print FH $_;
+	}
+	print FH "\n";
+	close(FH);
+}
 
-# Appending previous files is not inside.
-
-my $iter = $dir->iterator;
-while (my $year_dir = $iter->()) {
-	if ($year_dir->is_dir() and not $year_dir eq "aoc" and not $year_dir eq ".git") {
-		print_year("$aoc_dir/$year_dir.md", $year_dir);
-		my $inner_iter = $year_dir->iterator;
-		while (my $day_dir = $inner_iter->()) {
-			my $day = (split /\//, $day_dir)[1];
-			$day =~ s/^0//g;
-			print_day("$aoc_dir/$year_dir-$day.md", $year_dir, $day);
-			my $day_iter = $day_dir->iterator;
-			while (my $file = $day_iter->()) {
-				if ($file->is_dir() and $file =~ /^.*\/src/) {
-					my $src_iter = $file->iterator;
-					while (my $src_file = $src_iter->()) {
-						my $src_file_name = $file;
-						$src_file_name =~ s/^.*\///g;
-						if (not grep {$_ eq $src_file_name} @forb) {
-							print_file($src_file, "$aoc_dir/$year_dir-$day.md");
-						}
+sub create_pages {
+	my ($path) = @_;
+	my $aoc_dir = "$path/aoc";
+	my $aoc_file = "$path/adventofcode.md";
+	mkdir "$aoc_dir";
+	print_aoc($aoc_file);
+	my $iter = $dir->iterator;
+	while (my $year_dir = $iter->()) {
+		if ($year_dir->is_dir() and $year_dir =~ /20[0-9][0-9]/) {
+			my @year_path = (split /\//, $year_dir);
+			my $year = $year_path[@year_path - 1];
+			print_year("$aoc_dir/$year.md", $year);
+			append_year("$aoc_file", $year);
+			my $inner_iter = $year_dir->iterator;
+			while (my $day_dir = $inner_iter->()) {
+				my $day = (split /\//, $day_dir)[1];
+				$day =~ s/^0//g;
+				print_day("$aoc_dir/$year-$day.md", $year, $day);
+				append_day("$aoc_dir/$year.md", $year, $day);
+				my $day_iter = $day_dir->iterator;
+				while (my $file = $day_iter->()) {
+					if ($file =~ /.*\/info\.md/) {
+						print_info($file, "$aoc_dir/$year-$day.md");
 					}
 				}
-				elsif (not $file->is_dir()) {
-					my $file_name = $file;
-					$file_name =~ s/^.*\///g;
-					if (not grep {$_ eq $file_name} @forb) {
-						print_file($file, "$aoc_dir/$year_dir-$day.md");
+				$day_iter = $day_dir->iterator;
+				while (my $file = $day_iter->()) {
+					if ($file->is_dir() and $file =~ /^.*\/src/) {
+						my $src_iter = $file->iterator;
+						while (my $src_file = $src_iter->()) {
+							my $src_file_name = $file;
+							$src_file_name =~ s/^.*\///g;
+							if (not grep {$_ eq $src_file_name} @forb) {
+								print_file($src_file, "$aoc_dir/$year-$day.md");
+							}
+						}
+					}
+					elsif (not $file->is_dir()) {
+						my $file_name = $file;
+						$file_name =~ s/^.*\///g;
+						if (not grep {$_ eq $file_name} @forb) {
+							print_file($file, "$aoc_dir/$year-$day.md");
+						}
 					}
 				}
 			}
 		}
 	}
 }
+
+my ($path) = @ARGV;
+
+create_pages($path);
+
