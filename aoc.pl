@@ -265,7 +265,7 @@ if (1 > @ARGV) {
 }
 
 if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
-	print "🎄🎄 aoc.pl is simple tool for organizing advent of code folders throughout hte years.\n";
+	print "🎄🎄 aoc.pl is simple tool for organizing advent of code folders throughout the years.\n";
 	print "It is used for two purposes:\n";
 	print "\t1) Creating pages for jekyll. - This is done by calling it wiht -p or --pages and optional path where to create it.\n";
 	print "\t2) Creating projects for a given day. - You have more options.\n";
@@ -277,6 +277,7 @@ if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
 	print "\t\t\t\ So call ./aoc.pl -t rust 2023 5 to create rust project for 2023/12/5.\n";
 	print "\t\td) You may leave out the language and only add year and day you want to solve.\n";
 	print "\t\t\t\ So call ./aoc.pl -t 2023 5 to create rust (default) project for 2023/12/5.\n";
+	print "\t3) Also you may call `./aoc.pl -g` or `--gitignore` to create basic gitignore file.\n";
 	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), ... (some may be added later on).\n";
 	exit;
 }
@@ -286,7 +287,7 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 	if (@ARGV > 1) {
 		$path = $ARGV[1];
 	}
-	print "🎄 Creating pages to $path. 🎄\n";
+	print "🎄 Creating pages to `$path`. 🎄\n";
 	create_pages($path);
 } elsif ($ARGV[0] eq "-t" or $ARGV[0] eq "--template") {
 	my ($sec, $min, $hour, $day, $month, $year) = localtime(time);
@@ -315,4 +316,9 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 	else {
 		print "The given language $lang is not supported.\n";
 	}
+} elsif ($ARGV[0] eq "-g" or $ARGV[0] eq "--gitignore") {
+	print "🎄 Creating basic `.gitignore` file. 🎄\n";
+	open(FH, '>', ".gitignore");
+	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n";
+	close(FH);
 }
