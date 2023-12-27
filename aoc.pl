@@ -2,6 +2,11 @@
 use strict;
 use warnings;
 use Path::Tiny;
+use LWP::Simple;
+
+## ================== ##
+## == Create pages == ##
+## ================== ##
 
 my $dir = path('.');
 my $aoc = "advent of code";
@@ -48,6 +53,7 @@ sub print_year {
 	close(FH);
 }
 
+# Append day to the year page.
 sub append_day {
 	my ($name, $year, $day) = @_;
 	open(FH, '>>', $name) or die $!;
@@ -101,6 +107,7 @@ sub print_info {
 	close(FH);
 }
 
+# Process signle file to the day file.
 sub process_file {
 	my ($aoc_dir, $year, $day, $file) = @_;
 	my $file_name = $file;
@@ -110,6 +117,7 @@ sub process_file {
 	}
 }
 
+# Process whole day directory.
 sub process_day {
 	my ($aoc_dir, $year, $day_dir) = @_;
 	if ($day_dir->is_dir() and $day_dir =~ /.*\/[0-9][1-9]/ ){
@@ -135,6 +143,7 @@ sub process_day {
 	}
 }
 
+# Process whole year directory.
 sub process_year {
 	my ($aoc_dir, $year_dir, $aoc_file) = @_;
 	if ($year_dir->is_dir() and $year_dir =~ /20[0-9][0-9]/) {
@@ -152,6 +161,7 @@ sub process_year {
 	}
 }
 
+# Create all pages.
 sub create_pages {
 	my ($path) = @_;
 	my $aoc_dir = "$path/aoc";
@@ -166,7 +176,143 @@ sub create_pages {
 	}
 }
 
-my ($path) = @ARGV;
+## =============== ##
+## == Templates == ##
+## =============== ##
 
-create_pages($path);
+sub get_name {
+	my ($day, $year) = @_;
+	my $url = "https://adventofcode.com/$year/day/$day";
+	my $html = get($url);
+	if (defined $html) {
+		if ($html =~ /--- Day [0-9]+: ([^-]*) ---/){
+			return $1;
+		}
+	} else {
+		die "Failed to retrieve HTML from $url";
+	}
+}
 
+sub general_template {
+	my ($day, $year) = @_;
+	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	mkdir $year;
+	my $path = "$year/$written_day";
+	mkdir $path;
+	if (not -e "$path/INPUT") {
+		open(FH, '>', "$path/INPUT");
+		print FH "";
+		close(FH);
+	}
+	if (not -e "$path/info.md"){
+		open(FH, '>', "$path/info.md");
+		print FH "#### Part 1\n\n#### Part 2\n\n";
+		close(FH);
+	}
+}
+
+sub rust_template {
+	my ($day, $year, $name) = @_;
+	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	mkdir $year;
+	if (path("$year/$written_day")->is_dir()) {
+		die "This project already exists.\n";
+	}
+	system("cargo", "new", "$year/aoc-$year-$day");
+	rename("$year/aoc-$year-$day", "$year/$written_day");
+	open(FH, '>', "$year/$written_day/src/main.rs");
+	print FH "use std::fs\n\n";
+	print FH "fn read_file(filepath: &str) -> Vec<&str> {\n";
+	print FH "\tlet contents = fs::read_to_string(filepath);\n";
+	print FH "\tlet binding = contents.expect(\"REASON\");\n";
+	print FH "\tlet lines: Vec<&str> = binding.split('\\n').collect();\n";
+	print FH "\tlines\n}\n\n";
+	print FH "fn part1() {\n";
+	print FH "\tprintln!(\"Part 1: {}\", 0);\n}\n\n";
+	print FH "fn part2() {\n";
+	print FH "\tprintln!(\"Part 2: {}\", 0);\n}\n\n";
+	print FH "fn main() {\n";
+	print FH "\tprintln!(\"Year $year day $day - $name\");\n";
+	print FH "\tpart1();\n\tpart2();\n}\n";
+	close(FH);
+}
+
+sub python_template {
+	my ($day, $year, $name) = @_;
+	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	mkdir $year;
+	if (path("$year/$written_day")->is_dir()) {
+		die "This project already exists.\n";
+	}
+	mkdir "$year/$written_day";
+	open(FH, '>', "$year/$written_day/main.py");
+	print FH "#!/usr/bin/env python3\n\n";
+	print FH "def read_file(file):\n\twith open(file, 'r') as f:\n\t\tfor line in f:\n\t\t\tprint(line)\n\n";
+	print FH "def part1():\n\tprint(f\"Part 1: {0}\")\n\n";
+	print FH "def part2():\n\tprint(f\"Part 2: {0}\")\n\n";
+	print FH "if __name__ == \"__main__\":\n\tprint(\"Year $year day $day - $name\")\n\tpart1()\n\tpart2()\n\n";
+	close(FH);
+	system("chmod", "+x", "$year/$written_day/main.py");
+}
+
+## ================== ##
+## == Main Program == ##
+## ================== ##
+
+if (1 > @ARGV) {
+	print "There must be at least one argument. Run -h or --help for more information.\n";
+	exit;
+}
+
+if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
+	print "🎄🎄 aoc.pl is simple tool for organizing advent of code folders throughout hte years.\n";
+	print "It is used for two purposes:\n";
+	print "\t1) Creating pages for jekyll. - This is done by calling it wiht -p or --pages and optional path where to create it.\n";
+	print "\t2) Creating projects for a given day. - You have more options.\n";
+	print "\t\ta) Default language is rust. Then you call it by adding -t or --template.\n";
+	print "\t\t\t\ So call ./aoc.pl -t to create rust project for today.\n";
+	print "\t\tb) Next you may specify your language: by also adding the languege.\n";
+	print "\t\t\t\ So call ./aoc.pl -t py to create python project for today.\n";
+	print "\t\tc) Next you may also specify which year and day you want to solve.\n";
+	print "\t\t\t\ So call ./aoc.pl -t rust 2023 5 to create rust project for 2023/12/5.\n";
+	print "\t\td) You may leave out the language and only add year and day you want to solve.\n";
+	print "\t\t\t\ So call ./aoc.pl -t 2023 5 to create rust (default) project for 2023/12/5.\n";
+	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), ... (some may be added later on).\n";
+	exit;
+}
+
+if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
+	my $path = '.';
+	if (@ARGV > 1) {
+		$path = $ARGV[1];
+	}
+	print "🎄 Creating pages to $path. 🎄\n";
+	create_pages($path);
+} elsif ($ARGV[0] eq "-t" or $ARGV[0] eq "--template") {
+	my ($sec, $min, $hour, $day, $month, $year) = localtime(time);
+	$year += 1900;
+	my $lang = "rust";
+	if (@ARGV == 2) {
+		$lang = $ARGV[1];
+	} elsif (@ARGV == 3) {
+		$year = $ARGV[1];
+		$day = $ARGV[2];
+	} elsif (@ARGV > 3) {
+		$lang = $ARGV[1];
+		$year = $ARGV[2];
+		$day = $ARGV[3];
+	}
+	my $name = get_name($day, $year);
+	if ($lang eq "rust" or $lang eq "RUST" or $lang eq "Rust" or $lang eq "r") {
+		print "🎄 Creating rust 🦀 project for $name (day: $day, year: $year). 🎄\n";
+		rust_template($day, $year, $name);
+		general_template($day, $year);
+	} elsif ($lang eq "py" or $lang eq "python" or $lang eq "Python") {
+		print "🎄 Creating python 🐍 project for $name (day: $day, year: $year). 🎄\n";
+		python_template($day, $year, $name);
+		general_template($day, $year);
+	}
+	else {
+		print "The given language $lang is not supported.\n";
+	}
+}
