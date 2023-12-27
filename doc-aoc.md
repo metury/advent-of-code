@@ -4,7 +4,7 @@ This is a short documentation for `aoc.pl` script.
 
 ## Running the script
 
-There are several use case for this script. If you run `./aoc.pl` it will be shut down because no arguments were given. There are three main types.
+There are several use case for this script. If you run `./aoc.pl` it will be shut down because no arguments were given. There are four main types.
 
 ### Help
 
@@ -43,5 +43,9 @@ Also you may call `./aoc.pl -p` or `./aoc.pl --pages` to generate markdown pages
 
 This page generator respects the structure of the projects which was shown earlier. Also in the script is defined forbidden files which will not be considered in the page generating.
 
+### Gitignore generator
+
+Also there is possibility to call `./aoc.pl -g` or `./aoc.pl --gitignore` to generate simple `.gitignore` file. This is to respect the copyrights on the input and not to sync useless files.
+
 > [!CAUTION]
-> use this script on your own and please do not blame me, since this is just mine hobby project. Also I was using perl for the first time. If you see something that can be upgraded, then you may do so by either creating issue or pull request.
+> Use this script on your own and please do not blame me, since this is just mine hobby project. Also I was using perl for the first time. If you see something that can be upgraded, then you may do so by either creating issue or pull request.
