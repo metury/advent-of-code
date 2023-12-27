@@ -43,5 +43,5 @@ Also you may call `./aoc.pl -p` or `./aoc.pl --pages` to generate markdown pages
 
 This page generator respects the structure of the projects which was shown earlier. Also in the script is defined forbidden files which will not be considered in the page generating.
 
-> [!INFO]
+> [!CAUTION]
 > use this script on your own and please do not blame me, since this is just mine hobby project. Also I was using perl for the first time. If you see something that can be upgraded, then you may do so by either creating issue or pull request.
