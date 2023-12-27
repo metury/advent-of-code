@@ -101,53 +101,68 @@ sub print_info {
 	close(FH);
 }
 
+sub process_file {
+	my ($aoc_dir, $year, $day, $file) = @_;
+	my $file_name = $file;
+	$file_name =~ s/^.*\///g;
+	if (not grep {$_ eq $file_name} @forb) {
+		print_file($file, "$aoc_dir/$year-$day.md");
+	}
+}
+
+sub process_day {
+	my ($aoc_dir, $year, $day_dir) = @_;
+	if ($day_dir->is_dir() and $day_dir =~ /.*\/[0-9][1-9]/ ){
+	my $day = (split /\//, $day_dir)[1];
+		$day =~ s/^0//g;
+		print_day("$aoc_dir/$year-$day.md", $year, $day);
+		append_day("$aoc_dir/$year.md", $year, $day);
+		if (-e "$day_dir/info.md" ) {
+			print_info("$day_dir/info.md", "$aoc_dir/$year-$day.md");
+		}
+		my $day_iter = $day_dir->iterator;
+		while (my $file = $day_iter->()) {
+			if ($file->is_dir() and $file =~ /^.*\/src/) {
+				my $src_iter = $file->iterator;
+				while (my $src_file = $src_iter->()) {
+					process_file($aoc_dir, $year, $day, $src_file);
+				}
+			}
+			elsif (not $file->is_dir()) {
+				process_file($aoc_dir, $year, $day, $file);
+			}
+		}
+	}
+}
+
+sub process_year {
+	my ($aoc_dir, $year_dir, $aoc_file) = @_;
+	if ($year_dir->is_dir() and $year_dir =~ /20[0-9][0-9]/) {
+		my @year_path = (split /\//, $year_dir);
+		my $year = $year_path[@year_path - 1];
+		print_year("$aoc_dir/$year.md", $year);
+		append_year("$aoc_file", $year);
+		opendir(DIR, $year_dir) or die $!;
+		my @directories = sort readdir(DIR);
+		closedir(DIR);
+		foreach my $day_dir (@directories) {
+			$day_dir = path("$year_dir/$day_dir");
+			process_day($aoc_dir, $year, $day_dir);
+		}
+	}
+}
+
 sub create_pages {
 	my ($path) = @_;
 	my $aoc_dir = "$path/aoc";
 	my $aoc_file = "$path/adventofcode.md";
 	mkdir "$aoc_dir";
 	print_aoc($aoc_file);
-	my $iter = $dir->iterator;
-	while (my $year_dir = $iter->()) {
-		if ($year_dir->is_dir() and $year_dir =~ /20[0-9][0-9]/) {
-			my @year_path = (split /\//, $year_dir);
-			my $year = $year_path[@year_path - 1];
-			print_year("$aoc_dir/$year.md", $year);
-			append_year("$aoc_file", $year);
-			my $inner_iter = $year_dir->iterator;
-			while (my $day_dir = $inner_iter->()) {
-				my $day = (split /\//, $day_dir)[1];
-				$day =~ s/^0//g;
-				print_day("$aoc_dir/$year-$day.md", $year, $day);
-				append_day("$aoc_dir/$year.md", $year, $day);
-				my $day_iter = $day_dir->iterator;
-				while (my $file = $day_iter->()) {
-					if ($file =~ /.*\/info\.md/) {
-						print_info($file, "$aoc_dir/$year-$day.md");
-					}
-				}
-				$day_iter = $day_dir->iterator;
-				while (my $file = $day_iter->()) {
-					if ($file->is_dir() and $file =~ /^.*\/src/) {
-						my $src_iter = $file->iterator;
-						while (my $src_file = $src_iter->()) {
-							my $src_file_name = $file;
-							$src_file_name =~ s/^.*\///g;
-							if (not grep {$_ eq $src_file_name} @forb) {
-								print_file($src_file, "$aoc_dir/$year-$day.md");
-							}
-						}
-					}
-					elsif (not $file->is_dir()) {
-						my $file_name = $file;
-						$file_name =~ s/^.*\///g;
-						if (not grep {$_ eq $file_name} @forb) {
-							print_file($file, "$aoc_dir/$year-$day.md");
-						}
-					}
-				}
-			}
-		}
+	opendir(DIR, $dir) or die $!;
+	my @directories = sort readdir(DIR);
+	closedir(DIR);
+	foreach my $year_dir (@directories) {
+		process_year($aoc_dir, path("$dir/$year_dir"), $aoc_file);
 	}
 }
 
