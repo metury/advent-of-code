@@ -11,7 +11,7 @@ use LWP::Simple;
 my $dir = path('.');
 my $aoc = "advent of code";
 my $link = "/aoc/";
-my @forb = ("INPUT", "OUTPUT", "Cargo.toml", "Cargo.lock", "info.md", "main", "graph.dot", "graph.png", "graph.svg");
+my @forb = ("INPUT", "OUTPUT", "Cargo.toml", "Cargo.lock", "info.md", "main", "graph.dot", "graph.png", "graph.svg", "Makefile");
 
 # Print main file of the aoc.
 sub print_aoc {
@@ -273,6 +273,29 @@ sub perl_template {
 	system("chmod", "+x", "$year/$written_day/main.pl");
 }
 
+sub cpp_template {
+	my ($day, $year, $name) = @_;
+	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	mkdir $year;
+	if (path("$year/$written_day")->is_dir()) {
+		die "This project already exists.\n";
+	}
+	mkdir "$year/$written_day";
+	open(FH, '>', "$year/$written_day/main.cpp") or die $!;
+	print FH "#include <iostream>\n#include <fstream>\n#include <vector>\n#include <string>\n\n";
+	print FH "using namespace std;\n\n";
+	print FH "vector<string> read_file(const string& filepath){\n\tifstream ifs;\n\tifs.open(filepath);\n\tstring line;\n\tvector<string> ret;\n\t";
+	print FH "while(getline(ifs, line)){\n\t\tret.push_back(line);\n\t}\n\treturn ret;\n}\n\n";
+	print FH "void part1(){\n\tcout << \"Part 1:\" << 0 << endl;\n}\n\n";
+	print FH "void part2(){\n\tcout << \"Part 2:\" << 0 << endl;\n}\n\n";
+	print FH "int main(int argc, char** argv) {\n\tcout << \"Year $year day $day - $name\" << endl;\n\tpart1();\n\tpart2();\n}\n\n";
+	close(FH);
+	open(FH, '>', "$year/$written_day/Makefile") or die $!;
+	print FH "FILES = main\nFILES_O := \$(addsuffix .o, \$(FILES))\n\nmain: \$(FILES_O)\n\tg++ -o main \$(FILES_O)\n\n";
+	print FH "%.o: %.cpp\n\tg++ -c \$<\n\nclean:\n\trm -f main *.o *.gch\n\n";
+	close(FH);
+}
+
 ## ================== ##
 ## == Main Program == ##
 ## ================== ##
@@ -296,7 +319,7 @@ if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
 	print "\t\td) You may leave out the language and only add year and day you want to solve.\n";
 	print "\t\t\t\ So call ./aoc.pl -t 2023 5 to create rust (default) project for 2023/12/5.\n";
 	print "\t3) Also you may call `./aoc.pl -g` or `--gitignore` to create basic gitignore file.\n";
-	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), Perl (perl, pl), ... (some may be added later on).\n";
+	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), Perl (perl, pl), Cpp (cpp, cc, c++).\n";
 	exit;
 }
 
@@ -334,8 +357,11 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 		print "🎄 Creating perl 🐪 project for $name (day: $day, year: $year). 🎄\n";
 		perl_template($day, $year, $name);
 		general_template($day, $year);
-	}
-	else {
+	} elsif ($lang =~ /c[+p][+p]/i or $lang =~ /cc/i) {
+		print "🎄 Creating cpp ➕➕ project for $name (day: $day, year: $year). 🎄\n";
+		cpp_template($day, $year, $name);
+		general_template($day, $year);
+	} else {
 		print "The given language $lang is not supported.\n";
 	}
 } elsif ($ARGV[0] eq "-g" or $ARGV[0] eq "--gitignore") {
