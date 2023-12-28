@@ -7,18 +7,6 @@ fn read_file(filepath: &str) -> String{
 	return lines.next().unwrap().to_string();
 }
 
-fn floor_number(string: &str) -> i64 {
-	let mut floor: i64 = 0;
-	for c in string.chars() {
-		match c {
-			'(' => floor += 1,
-			')' => floor -= 1,
-			_   => floor = floor,
-		}
-	}
-	floor
-}
-
 fn basement(string: &str) -> i64 {
 	let mut floor: i64 = 0;
 	let mut i: i64 = 0;
@@ -38,7 +26,10 @@ fn basement(string: &str) -> i64 {
 
 fn part1(){
 	let line = read_file("INPUT");
-	println!("Part 1: {}", floor_number(&line));
+	let total = line.chars().into_iter()
+			.map(|c| if c == '(' { 1 } else { -1 })
+			.fold(0, |acc, x| acc + x);
+	println!("Part 1: {}", total);
 }
 
 fn part2(){
