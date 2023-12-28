@@ -255,6 +255,24 @@ sub python_template {
 	system("chmod", "+x", "$year/$written_day/main.py");
 }
 
+sub perl_template {
+	my ($day, $year, $name) = @_;
+	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	mkdir $year;
+	if (path("$year/$written_day")->is_dir()) {
+		die "This project already exists.\n";
+	}
+	mkdir "$year/$written_day";
+	open(FH, '>', "$year/$written_day/main.pl") or die $!;
+	print FH "#!/usr/bin/perl\n\n";
+	print FH "sub read_file {\n\tmy (\$path) = \@_;\n\topen(IN, '<', \$path) or die \$!;\n\twhile (<IN>) {\n\t\t\$_;\n\t}\n\tclose(IN);\n}\n\n";
+	print FH "sub part1 {\n\tprint \"Part 1: 0\";\n}\n\n";
+	print FH "sub part2 {\n\tprint \"Part 2: 0\";\n}\n\n";
+	print FH "print \"Year $year day $day 0 $name\";\npart1()\npart2()\n";
+	close(FH);
+	system("chmod", "+x", "$year/$written_day/main.pl");
+}
+
 ## ================== ##
 ## == Main Program == ##
 ## ================== ##
@@ -278,7 +296,7 @@ if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
 	print "\t\td) You may leave out the language and only add year and day you want to solve.\n";
 	print "\t\t\t\ So call ./aoc.pl -t 2023 5 to create rust (default) project for 2023/12/5.\n";
 	print "\t3) Also you may call `./aoc.pl -g` or `--gitignore` to create basic gitignore file.\n";
-	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), ... (some may be added later on).\n";
+	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), Perl (perl, pl), ... (some may be added later on).\n";
 	exit;
 }
 
@@ -304,13 +322,17 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 		$day = $ARGV[3];
 	}
 	my $name = get_name($day, $year);
-	if ($lang eq "rust" or $lang eq "RUST" or $lang eq "Rust" or $lang eq "r") {
+	if ($lang =~ /rust/i or $lang eq "r") {
 		print "🎄 Creating rust 🦀 project for $name (day: $day, year: $year). 🎄\n";
 		rust_template($day, $year, $name);
 		general_template($day, $year);
-	} elsif ($lang eq "py" or $lang eq "python" or $lang eq "Python") {
+	} elsif ($lang eq "py" or $lang =~ /python/i) {
 		print "🎄 Creating python 🐍 project for $name (day: $day, year: $year). 🎄\n";
 		python_template($day, $year, $name);
+		general_template($day, $year);
+	} elsif ($lang eq "pl" or $lang =~ /perl/i) {
+		print "🎄 Creating perl 🐪 project for $name (day: $day, year: $year). 🎄\n";
+		perl_template($day, $year, $name);
 		general_template($day, $year);
 	}
 	else {
