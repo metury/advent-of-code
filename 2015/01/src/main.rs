@@ -26,9 +26,9 @@ fn basement(string: &str) -> i64 {
 
 fn part1(){
 	let line = read_file("INPUT");
-	let total = line.chars().into_iter()
+	let total: i64 = line.chars().into_iter()
 			.map(|c| if c == '(' { 1 } else { -1 })
-			.fold(0, |acc, x| acc + x);
+			.sum();
 	println!("Part 1: {}", total);
 }
 

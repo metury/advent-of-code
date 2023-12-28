@@ -221,7 +221,7 @@ sub rust_template {
 	system("cargo", "new", "$year/aoc-$year-$day");
 	rename("$year/aoc-$year-$day", "$year/$written_day");
 	open(FH, '>', "$year/$written_day/src/main.rs") or die $!;
-	print FH "use std::fs\n\n";
+	print FH "use std::fs;\n\n";
 	print FH "fn read_file(filepath: &str) -> Vec<&str> {\n";
 	print FH "\tlet contents = fs::read_to_string(filepath);\n";
 	print FH "\tlet binding = contents.expect(\"REASON\");\n";
