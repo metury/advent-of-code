@@ -4,6 +4,15 @@ use warnings;
 use Path::Tiny;
 use LWP::Simple;
 
+## ======================= ##
+## == Global constants. == ##
+## ======================= ##
+
+my $limit_year_low = 2015;
+my $limit_year_high = 2023;
+my $limit_day_low = 1;
+my $limit_day_high = 25;
+
 ## ================== ##
 ## == Create pages == ##
 ## ================== ##
@@ -301,12 +310,12 @@ sub cpp_template {
 ## ================== ##
 
 if (1 > @ARGV) {
-	print "There must be at least one argument. Run -h or --help for more information.\n";
+	print "🎄 There must be at least one argument. Run -h or --help for more information. 🎄\n";
 	exit;
 }
 
 if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
-	print "🎄🎄 aoc.pl is simple tool for organizing advent of code folders throughout the years.\n";
+	print "🎄 aoc.pl is simple tool for organizing advent of code folders throughout the years. 🎄\n";
 	print "It is used for two purposes:\n";
 	print "\t1) Creating pages for jekyll. - This is done by calling it wiht -p or --pages and optional path where to create it.\n";
 	print "\t2) Creating projects for a given day. - You have more options.\n";
@@ -344,12 +353,12 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 		$year = $ARGV[2];
 		$day = $ARGV[3];
 	}
-	if (not $year =~ /^2[0-9][0-9][0-9]/ or $year < 2015 or $year > 2023) {
-		print "Given year $year is not in a good format. Or is outside the limits.\n";
+	if (not $year =~ /^2[0-9][0-9][0-9]$/ or $year < $limit_year_low or $year > $limit_year_high) {
+		print "🎄 Given year $year is not in a good format. Or is outside the limits [$limit_year_low - $limit_year_high]. 🎄\n";
 		exit;
 	}
-	if (not $day =~ /^[1-9]+/ or $day <= 0 or $day > 25) {
-		print "Given day $day is not in a good foramt. Or is beyond the limit.\n";
+	if (not $day =~ /^[1-9]+$/ or $day < $limit_day_low or $day > $limit_day_high) {
+		print "🎄 Given day $day is not in a good foramt. Or is beyond the limit [$limit_day_low - $limit_day_high]. 🎄\n";
 		exit;
 	}
 	my $name = get_name($day, $year);
@@ -377,4 +386,6 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 	open(FH, '>', ".gitignore") or die $!;
 	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n";
 	close(FH);
+} else {
+	print "🎄 Nothing was called try using -h or --help. 🎄\n";
 }
