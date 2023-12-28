@@ -222,10 +222,10 @@ sub rust_template {
 	rename("$year/aoc-$year-$day", "$year/$written_day");
 	open(FH, '>', "$year/$written_day/src/main.rs") or die $!;
 	print FH "use std::fs;\n\n";
-	print FH "fn read_file(filepath: &str) -> Vec<&str> {\n";
+	print FH "fn read_file(filepath: &str) -> Vec<String> {\n";
 	print FH "\tlet contents = fs::read_to_string(filepath);\n";
 	print FH "\tlet binding = contents.expect(\"REASON\");\n";
-	print FH "\tlet lines: Vec<&str> = binding.split('\\n').collect();\n";
+	print FH "\tlet lines = binding.split('\\n')\n\t\t.filter(|c| c.len() > 0)\n\t\t.map(|c| c.to_string().collect();\n";
 	print FH "\tlines\n}\n\n";
 	print FH "fn part1() {\n";
 	print FH "\tprintln!(\"Part 1: {}\", 0);\n}\n\n";
@@ -343,6 +343,14 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 		$lang = $ARGV[1];
 		$year = $ARGV[2];
 		$day = $ARGV[3];
+	}
+	if (not $year =~ /^2[0-9][0-9][0-9]/ or $year < 2015 or $year > 2023) {
+		print "Given year $year is not in a good format. Or is outside the limits.\n";
+		exit;
+	}
+	if (not $day =~ /^[1-9]+/ or $day <= 0 or $day > 25) {
+		print "Given day $day is not in a good foramt. Or is beyond the limit.\n";
+		exit;
 	}
 	my $name = get_name($day, $year);
 	if ($lang =~ /rust/i or $lang eq "r") {

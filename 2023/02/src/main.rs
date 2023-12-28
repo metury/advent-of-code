@@ -8,8 +8,8 @@ fn read_file(filepath: &str) -> Vec<String> {
 	let contents = fs::read_to_string(filepath);
 	let binding = contents.expect("REASON");
 	let lines: Vec<String> = binding.split('\n')
-			.filter(|c| c.len() > 0)
-			.map(|c| c.to_string()).collect();
+		.filter(|c| c.len() > 0)
+		.map(|c| c.to_string()).collect();
 	lines
 }
 
