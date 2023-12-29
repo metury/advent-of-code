@@ -32,11 +32,7 @@ fn robo_santa(line: &str) -> usize {
 	let mut pos: Pos = (0,0);
 	let mut robo_pos: Pos = (0,0);
 	houses.insert(pos);
-	let mut robo: bool = false;
 	for c in line.chars() {
-		if robo {
-			(pos, robo_pos) = (robo_pos, pos);
-		}
 		match c {
 			'>' => pos = (pos.0, pos.1 + 1),
 			'<' => pos = (pos.0, pos.1 - 1),
@@ -45,10 +41,7 @@ fn robo_santa(line: &str) -> usize {
 			 _  => pos = pos,
 		}
 		houses.insert(pos);
-		if robo {
-			(pos, robo_pos) = (robo_pos, pos);
-		}
-		robo = !robo;
+		(pos, robo_pos) = (robo_pos, pos);
 	}
 	houses.len()
 }
