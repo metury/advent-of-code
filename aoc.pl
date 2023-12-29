@@ -234,7 +234,7 @@ sub rust_template {
 	print FH "fn read_file(filepath: &str) -> Vec<String> {\n";
 	print FH "\tlet contents = fs::read_to_string(filepath);\n";
 	print FH "\tlet binding = contents.expect(\"REASON\");\n";
-	print FH "\tlet lines = binding.split('\\n')\n\t\t.filter(|c| c.len() > 0)\n\t\t.map(|c| c.to_string().collect();\n";
+	print FH "\tlet lines = binding.split('\\n')\n\t\t.filter(|c| c.len() > 0)\n\t\t.map(|c| c.to_string()).collect();\n";
 	print FH "\tlines\n}\n\n";
 	print FH "fn part1() {\n";
 	print FH "\tprintln!(\"Part 1: {}\", 0);\n}\n\n";
