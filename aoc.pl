@@ -384,7 +384,7 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 } elsif ($ARGV[0] eq "-g" or $ARGV[0] eq "--gitignore") {
 	print "🎄 Creating basic `.gitignore` file. 🎄\n";
 	open(FH, '>', ".gitignore") or die $!;
-	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n";
+	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n*.o\n*.gch\n";
 	close(FH);
 } else {
 	print "🎄 Nothing was called try using -h or --help. 🎄\n";
