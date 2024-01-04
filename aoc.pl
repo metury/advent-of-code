@@ -204,7 +204,10 @@ sub get_name {
 
 sub general_template {
 	my ($day, $year) = @_;
-	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	my $written_day = $day;
+	if ($day =~ /^[1-9]$/) {
+		$written_day = "0$day";
+	}
 	mkdir $year;
 	my $path = "$year/$written_day";
 	mkdir $path;
@@ -222,7 +225,10 @@ sub general_template {
 
 sub rust_template {
 	my ($day, $year, $name) = @_;
-	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	my $written_day = $day;
+	if ($day =~ /^[1-9]$/) {
+		$written_day = "0$day";
+	}
 	mkdir $year;
 	if (path("$year/$written_day")->is_dir()) {
 		die "This project already exists.\n";
@@ -248,7 +254,10 @@ sub rust_template {
 
 sub python_template {
 	my ($day, $year, $name) = @_;
-	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	my $written_day = $day;
+	if ($day =~ /^[1-9]$/) {
+		$written_day = "0$day";
+	}
 	mkdir $year;
 	if (path("$year/$written_day")->is_dir()) {
 		die "This project already exists.\n";
@@ -266,7 +275,10 @@ sub python_template {
 
 sub perl_template {
 	my ($day, $year, $name) = @_;
-	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	my $written_day = $day;
+	if ($day =~ /^[1-9]$/) {
+		$written_day = "0$day";
+	}
 	mkdir $year;
 	if (path("$year/$written_day")->is_dir()) {
 		die "This project already exists.\n";
@@ -284,7 +296,10 @@ sub perl_template {
 
 sub cpp_template {
 	my ($day, $year, $name) = @_;
-	my $written_day = "0$day" if ($day =~ /[1-9]/);
+	my $written_day = $day;
+	if ($day =~ /^[1-9]$/) {
+		$written_day = "0$day";
+	}
 	mkdir $year;
 	if (path("$year/$written_day")->is_dir()) {
 		die "This project already exists.\n";
@@ -357,7 +372,7 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 		print "🎄 Given year $year is not in a good format. Or is outside the limits [$limit_year_low - $limit_year_high]. 🎄\n";
 		exit;
 	}
-	if (not $day =~ /^[1-9]+$/ or $day < $limit_day_low or $day > $limit_day_high) {
+	if (not $day =~ /^[1-9][0-9]*$/ or $day < $limit_day_low or $day > $limit_day_high) {
 		print "🎄 Given day $day is not in a good foramt. Or is beyond the limit [$limit_day_low - $limit_day_high]. 🎄\n";
 		exit;
 	}
