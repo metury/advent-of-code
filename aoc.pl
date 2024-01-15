@@ -18,7 +18,7 @@ my $limit_day_high = 25;
 ## ================== ##
 
 my $dir = path('.');
-my $aoc = "advent of code";
+my $aoc = "Advent of Code";
 my $link = "/aoc/";
 my @forb = ("INPUT", "OUTPUT", "Cargo.toml", "Cargo.lock", "info.md", "main", "graph.dot", "graph.png", "graph.svg", "Makefile");
 
