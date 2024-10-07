@@ -39,7 +39,7 @@ Also the main strucutre for the files is:
 
 ### Page generating
 
-Also you may call `./aoc.pl -p` or `./aoc.pl --pages` to generate markdown pages to use with jekyll and also with github pages. There is an optional argument for the destination of the created files. So usualy you can call `./aoc.pl -p ../page-repo`. If the argument is not given the path `.` is used instead.
+Also you may call `./aoc.pl -p` or `./aoc.pl --pages` to generate markdown pages to use with mdbook and also with github pages. There is an optional argument for the destination of the created files. So usualy you can call `./aoc.pl -p ../page-repo`. If the argument is not given the path `.` is used instead.
 
 This page generator respects the structure of the projects which was shown earlier. Also in the script is defined forbidden files which will not be considered in the page generating.
 

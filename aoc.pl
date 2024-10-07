@@ -19,19 +19,15 @@ my $limit_day_high = 25;
 
 my $dir = path('.');
 my $aoc = "Advent of Code";
-my $link = "/aoc/";
+my $link = "./aoc/";
 my @forb = ("INPUT", "OUTPUT", "Cargo.toml", "Cargo.lock", "info.md", "main", "graph.dot", "graph.png", "graph.svg", "Makefile");
+my $root = "adventofcode.md";
 
 # Print main file of the aoc.
 sub print_aoc {
 	my ($name) = @_;
 	open(FH, '>', $name) or die $!;
-	print FH "---\n";
-	print FH "layout: page\n";
-	print FH "title: $aoc\n";
-	print FH "permalink: $link\n";
-	print FH "has_children: true\n";
-	print FH "---\n\n";
+	print FH "# Advent of code\n\n";
 	print FH "They are my solutions to [advent of code](https://adventofcode.com/) tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.\n";
 	print FH "Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. Also you may consider joining [Reddit](https://www.reddit.com/r/adventofcode/) where you may find useful tips, or help someone.\n\n";
 	print FH "### Years\n\n";
@@ -42,22 +38,19 @@ sub print_aoc {
 sub append_year {
 	my ($name, $year) = @_;
 	open(FH, '>>', $name) or die $!;
-	print FH "- [Year $year]($link$year)\n";
+	print FH "- [Year $year]($link$year.md)\n";
 	close(FH);
 }
 
 # Print year file.
 sub print_year {
-	my ($name, $year) = @_;
+	my ($name, $year, $mdbook) = @_;
+	open(MD, '>>', $mdbook) or die $!;
+	print MD "\t- [Year $year]($link$year.md)\n";
+	close(MD);
 	open(FH, '>', $name) or die $!;
-	print FH "---\n";
-	print FH "layout: page\n";
-	print FH "title: Year $year\n";
-	print FH "parent: $aoc\n";
-	print FH "permalink: $link$year\n";
-	print FH "has_children: true\n";
-	print FH "---\n\n";
-	print FH "This contains tasks from the [year $year](https://adventofcode.com/$year). Go back to [AOC]($link).\n\n";
+	print FH "# Advent of code - Year $year\n\n";
+	print FH "This contains tasks from the [year $year](https://adventofcode.com/$year). Go back to [AOC](../$root).\n\n";
 	print FH "### Days\n\n";
 	close(FH);
 }
@@ -66,22 +59,19 @@ sub print_year {
 sub append_day {
 	my ($name, $year, $day) = @_;
 	open(FH, '>>', $name) or die $!;
-	print FH "- [Day $day]($link$year/$day/)\n";
+	print FH "- [Day $day]($year-$day.md)\n";
 	close(FH);
 }
 
 # Print day file.
 sub print_day {
-	my ($name, $year, $day) = @_;
+	my ($name, $year, $day, $mdbook) = @_;
+	open(MD, '>>', $mdbook) or die $!;
+	print MD "\t\t- [Year $year day $day]($link$year-$day.md)\n";
+	close(MD);
 	open(FH, '>', $name) or die $!;
-	print FH "---\n";
-	print FH "layout: page\n";
-	print FH "title: Day $day\n";
-	print FH "parent: Year $year\n";
-	print FH "grand_parent: $aoc\n";
-	print FH "permalink: $link$year/$day/\n";
-	print FH "---\n\n";
-	print FH "This is a solution of the [day $day](https://adventofcode.com/$year/day/$day). Go back to year [$year]($link$year). Go back to [AOC]($link).\n\n";
+	print FH "# Advent of code - Year $year Day $day\n\n";
+	print FH "This is a solution of the [day $day](https://adventofcode.com/$year/day/$day). Go back to year [$year]($year.md). Go back to [AOC](../$root).\n\n";
 	close(FH);
 }
 
@@ -128,11 +118,11 @@ sub process_file {
 
 # Process whole day directory.
 sub process_day {
-	my ($aoc_dir, $year, $day_dir) = @_;
+	my ($aoc_dir, $year, $day_dir, $mdbook) = @_;
 	if ($day_dir->is_dir() and $day_dir =~ /.*\/[0-9][1-9]/ ){
 	my $day = (split /\//, $day_dir)[1];
 		$day =~ s/^0//g;
-		print_day("$aoc_dir/$year-$day.md", $year, $day);
+		print_day("$aoc_dir/$year-$day.md", $year, $day, $mdbook);
 		append_day("$aoc_dir/$year.md", $year, $day);
 		if (-e "$day_dir/info.md" ) {
 			print_info("$day_dir/info.md", "$aoc_dir/$year-$day.md");
@@ -154,18 +144,18 @@ sub process_day {
 
 # Process whole year directory.
 sub process_year {
-	my ($aoc_dir, $year_dir, $aoc_file) = @_;
+	my ($aoc_dir, $year_dir, $aoc_file, $mdbook) = @_;
 	if ($year_dir->is_dir() and $year_dir =~ /20[0-9][0-9]/) {
 		my @year_path = (split /\//, $year_dir);
 		my $year = $year_path[@year_path - 1];
-		print_year("$aoc_dir/$year.md", $year);
+		print_year("$aoc_dir/$year.md", $year, $mdbook);
 		append_year("$aoc_file", $year);
 		opendir(DIR, $year_dir) or die $!;
 		my @directories = sort readdir(DIR);
 		closedir(DIR);
 		foreach my $day_dir (@directories) {
 			$day_dir = path("$year_dir/$day_dir");
-			process_day($aoc_dir, $year, $day_dir);
+			process_day($aoc_dir, $year, $day_dir, $mdbook);
 		}
 	}
 }
@@ -174,14 +164,19 @@ sub process_year {
 sub create_pages {
 	my ($path) = @_;
 	my $aoc_dir = "$path/aoc";
-	my $aoc_file = "$path/adventofcode.md";
+	my $aoc_file = "$path/$root";
+	my $mdbook = "$path/mdbook.md";
+	open(MD, '>', $mdbook) or die $!;
+	print MD "# Advent of code\n\n";
+	print MD "- [Advent of code](./$root)\n";
+	close(MD);
 	mkdir "$aoc_dir";
 	print_aoc($aoc_file);
 	opendir(DIR, $dir) or die $!;
 	my @directories = sort readdir(DIR);
 	closedir(DIR);
 	foreach my $year_dir (@directories) {
-		process_year($aoc_dir, path("$dir/$year_dir"), $aoc_file);
+		process_year($aoc_dir, path("$dir/$year_dir"), $aoc_file, $mdbook);
 	}
 }
 
@@ -332,7 +327,7 @@ if (1 > @ARGV) {
 if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
 	print "🎄 aoc.pl is simple tool for organizing advent of code folders throughout the years. 🎄\n";
 	print "It is used for two purposes:\n";
-	print "\t1) Creating pages for jekyll. - This is done by calling it wiht -p or --pages and optional path where to create it.\n";
+	print "\t1) Creating pages for mdbook. - This is done by calling it wiht -p or --pages and optional path where to create it.\n";
 	print "\t2) Creating projects for a given day. - You have more options.\n";
 	print "\t\ta) Default language is rust. Then you call it by adding -t or --template.\n";
 	print "\t\t\t\ So call ./aoc.pl -t to create rust project for today.\n";
