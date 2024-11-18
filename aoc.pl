@@ -151,7 +151,7 @@ sub process_year {
 		print_year("$aoc_dir/$year.md", $year, $mdbook);
 		append_year("$aoc_file", $year);
 		opendir(DIR, $year_dir) or die $!;
-		my @directories = sort readdir(DIR);
+		my @directories = reverse sort readdir(DIR);
 		closedir(DIR);
 		foreach my $day_dir (@directories) {
 			$day_dir = path("$year_dir/$day_dir");
@@ -173,7 +173,7 @@ sub create_pages {
 	mkdir "$aoc_dir";
 	print_aoc($aoc_file);
 	opendir(DIR, $dir) or die $!;
-	my @directories = sort readdir(DIR);
+	my @directories = reverse sort readdir(DIR);
 	closedir(DIR);
 	foreach my $year_dir (@directories) {
 		process_year($aoc_dir, path("$dir/$year_dir"), $aoc_file, $mdbook);
