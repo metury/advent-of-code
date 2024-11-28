@@ -120,7 +120,7 @@ sub process_file {
 # Process whole day directory.
 sub process_day {
 	my ($aoc_dir, $year, $day_dir, $mdbook) = @_;
-	if ($day_dir->is_dir() and $day_dir =~ /.*\/[0-9][1-9]/ ){
+	if ($day_dir->is_dir() and $day_dir =~ /.*\/[0-9][0-9]/ ){
 	my $day = (split /\//, $day_dir)[1];
 		$day =~ s/^0//g;
 		print_day("$aoc_dir/$year-$day.md", $year, $day, $mdbook);
@@ -152,7 +152,7 @@ sub process_year {
 		print_year("$aoc_dir/$year.md", $year, $mdbook);
 		append_year("$aoc_file", $year);
 		opendir(DIR, $year_dir) or die $!;
-		my @directories = reverse sort readdir(DIR);
+		my @directories = sort readdir(DIR);
 		closedir(DIR);
 		foreach my $day_dir (@directories) {
 			$day_dir = path("$year_dir/$day_dir");
