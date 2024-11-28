@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Path::Tiny;
 use LWP::Simple;
+use Term::ANSIColor;
 
 ## ======================= ##
 ## == Global constants. == ##
@@ -319,26 +320,59 @@ sub cpp_template {
 ## == Main Program == ##
 ## ================== ##
 
+sub notify_creation {
+	my ($lang, $name, $day, $year) = @_;
+	print "Creating ";
+	print colored("$lang", 'cyan bold');
+	print " project for ";
+	print colored("$name", 'cyan bold');
+	print " (day: ";
+	print colored("$day", 'cyan');
+	print ", year: ";
+	print colored("$year", 'cyan');
+	print ").\n";
+}
+
 if (1 > @ARGV) {
-	print "🎄 There must be at least one argument. Run -h or --help for more information. 🎄\n";
+	print colored("There must be at least one argument. Run -h or --help for more information.\n", 'cyan bold');
 	exit;
 }
 
 if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help") {
-	print "🎄 aoc.pl is simple tool for organizing advent of code folders throughout the years. 🎄\n";
-	print "It is used for two purposes:\n";
-	print "\t1) Creating pages for mdbook. - This is done by calling it wiht -p or --pages and optional path where to create it.\n";
-	print "\t2) Creating projects for a given day. - You have more options.\n";
-	print "\t\ta) Default language is rust. Then you call it by adding -t or --template.\n";
-	print "\t\t\t\ So call ./aoc.pl -t to create rust project for today.\n";
-	print "\t\tb) Next you may specify your language: by also adding the languege.\n";
-	print "\t\t\t\ So call ./aoc.pl -t py to create python project for today.\n";
-	print "\t\tc) Next you may also specify which year and day you want to solve.\n";
-	print "\t\t\t\ So call ./aoc.pl -t rust 2023 5 to create rust project for 2023/12/5.\n";
-	print "\t\td) You may leave out the language and only add year and day you want to solve.\n";
-	print "\t\t\t\ So call ./aoc.pl -t 2023 5 to create rust (default) project for 2023/12/5.\n";
-	print "\t3) Also you may call `./aoc.pl -g` or `--gitignore` to create basic gitignore file.\n";
-	print "\nCurrently supported languages: Rust (rust, r), Python (python, py), Perl (perl, pl), Cpp (cpp, cc, c++).\n";
+	print colored(" ______     ______     ______     ______   __        \n", 'cyan');
+	print colored("/\\  __ \\   /\\  __ \\   /\\  ___\\   /\\  == \\ /\\ \\       \n", 'cyan');
+	print colored("\\ \\  __ \\  \\ \\ \\/\\ \\  \\ \\ \\____  \\ \\  _-/ \\ \\ \\____  \n", 'cyan');
+	print colored(" \\ \\_\\ \\_\\  \\ \\_____\\  \\ \\_____\\  \\ \\_\\    \\ \\_____\\ \n", 'cyan');
+	print colored("  \\/_/\\/_/   \\/_____/   \\/_____/   \\/_/     \\/_____/ \n", 'cyan');
+	print colored("                                                     \n\n", 'cyan');
+
+	print "This is a simple yet useful tool for organizing advent of code folders throughout the years. You may call it with multiple arguments.\n\n";
+
+	print colored("Template generating - create an almost empty solution for a given day.\n\n", 'green bold');
+
+	print colored("\tperl aoc.pl [-t | --template] [programming language] [year day]\t", 'cyan');
+	print "Define every property.\n";
+	print colored("\tperl aoc.pl [-t | --template] [programming language]           \t", 'cyan');
+	print "Use today as the date.\n";
+	print colored("\tperl aoc.pl [-t | --template] [year day]                       \t", 'cyan');
+	print "Use default language: rust.\n";
+	print colored("\tperl aoc.pl [-t | --template]                                  \t", 'cyan');
+	print "Use today date and default language.\n\n";
+
+	print colored("Extracting and generating pages - create multiple markdown files for mdbook.\n\n", 'green bold');
+
+	print colored("\tperl aoc.pl [-p | --pages] [files destination]\t", 'cyan');
+	print "Define your prefered destination.\n";
+	print colored("\tperl aoc.pl [-p | --pages]                    \t", 'cyan');
+	print "Use current directory for the destination.\n\n";
+
+	print colored("Create .gitignore - create simple gitignore to respect not sharing input and not to sync useless files.\n\n", 'green bold');
+
+	print colored("\tperl aoc.pl [-g | --gitignore]\n\n", 'cyan');
+
+	print colored("See help.\n\n", 'green bold');
+
+	print colored("\tperl aoc.pl [-h | --help]\n\n", 'cyan');
 	exit;
 }
 
@@ -347,7 +381,9 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 	if (@ARGV > 1) {
 		$path = $ARGV[1];
 	}
-	print "🎄 Creating pages to `$path`. 🎄\n";
+	print "Creating pages to ";
+	print colored("$path", 'cyan bold');
+	print ".\n";
 	create_pages($path);
 } elsif ($ARGV[0] eq "-t" or $ARGV[0] eq "--template") {
 	my ($sec, $min, $hour, $day, $month, $year) = localtime(time);
@@ -364,38 +400,48 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 		$day = $ARGV[3];
 	}
 	if (not $year =~ /^2[0-9][0-9][0-9]$/ or $year < $limit_year_low or $year > $limit_year_high) {
-		print "🎄 Given year $year is not in a good format. Or is outside the limits [$limit_year_low - $limit_year_high]. 🎄\n";
+		print "Given year ";
+		print colored("$year", 'cyan bold');
+		print " is not in a good format. Or is outside the limits ";
+		print colored("[$limit_year_low - $limit_year_high]", 'cyan');
+		print ".\n";
 		exit;
 	}
 	if (not $day =~ /^[1-9][0-9]*$/ or $day < $limit_day_low or $day > $limit_day_high) {
-		print "🎄 Given day $day is not in a good foramt. Or is beyond the limit [$limit_day_low - $limit_day_high]. 🎄\n";
+		print "Given day ";
+		print colored("$day", 'cyan bold');
+		print " is not in a good foramt. Or is beyond the limit ";
+		print colored("[$limit_day_low - $limit_day_high]", 'cyan');
+		print ".\n";
 		exit;
 	}
 	my $name = get_name($day, $year);
 	if ($lang =~ /rust/i or $lang eq "r") {
-		print "🎄 Creating rust 🦀 project for $name (day: $day, year: $year). 🎄\n";
+		notify_creation("rust", $name, $day, $year);
 		rust_template($day, $year, $name);
 		general_template($day, $year);
 	} elsif ($lang eq "py" or $lang =~ /python/i) {
-		print "🎄 Creating python 🐍 project for $name (day: $day, year: $year). 🎄\n";
+		notify_creation("python", $name, $day, $year);
 		python_template($day, $year, $name);
 		general_template($day, $year);
 	} elsif ($lang eq "pl" or $lang =~ /perl/i) {
-		print "🎄 Creating perl 🐪 project for $name (day: $day, year: $year). 🎄\n";
+		notify_creation("perl", $name, $day, $year);
 		perl_template($day, $year, $name);
 		general_template($day, $year);
 	} elsif ($lang =~ /c[+p][+p]/i or $lang =~ /cc/i) {
-		print "🎄 Creating cpp ➕➕ project for $name (day: $day, year: $year). 🎄\n";
+		notify_creation("cpp", $name, $day, $year);
 		cpp_template($day, $year, $name);
 		general_template($day, $year);
 	} else {
-		print "The given language $lang is not supported.\n";
+		print "The given language ";
+		print colored("$lang", 'cyan bold');
+		print " is not supported.\n";
 	}
 } elsif ($ARGV[0] eq "-g" or $ARGV[0] eq "--gitignore") {
-	print "🎄 Creating basic `.gitignore` file. 🎄\n";
+	print "Creating basic `.gitignore` file.\n";
 	open(FH, '>', ".gitignore") or die $!;
 	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n*.o\n*.gch\n";
 	close(FH);
 } else {
-	print "🎄 Nothing was called try using -h or --help. 🎄\n";
+	print colored("Wrong argument. Nothing was called try using -h or --help.\n", 'cyan bold');
 }
