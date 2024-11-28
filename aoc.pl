@@ -10,7 +10,7 @@ use Term::ANSIColor;
 ## ======================= ##
 
 my $limit_year_low = 2015;
-my $limit_year_high = 2023;
+my $limit_year_high = 2024;
 my $limit_day_low = 1;
 my $limit_day_high = 25;
 
