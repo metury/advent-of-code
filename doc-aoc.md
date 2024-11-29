@@ -39,7 +39,7 @@ Also the main strucutre for the files is:
 
 ### Page generating
 
-Also you may call `perl aoc.pl -p` or `perl aoc.pl --pages` to generate markdown pages to use with mdbook. There is an optional argument for the destination of the created files. So usualy you can call `perl aoc.pl -p /pathto/page-repo`. If the argument is not given the path `.` is used instead. Note that overwriting `SUMMARY.md` or appending it is not a good practise, so instead a file `mdbook.md` is created.
+Also you may call `perl aoc.pl -p` or `perl aoc.pl --pages` to generate markdown pages to use with mdbook. There is an optional argument for the destination of the created files. So usualy you can call `perl aoc.pl -p /pathto/page-repo`. If the argument is not given the path `.` is used instead. Note that `SUMMARY.md` is being appended.
 
 This page generator respects the structure of the projects which was shown earlier. Also in the script is defined forbidden files which will not be considered in the page generating.
 

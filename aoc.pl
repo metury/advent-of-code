@@ -166,8 +166,8 @@ sub create_pages {
 	my ($path) = @_;
 	my $aoc_dir = "$path/aoc";
 	my $aoc_file = "$path/$root";
-	my $mdbook = "$path/mdbook.md";
-	open(MD, '>', $mdbook) or die $!;
+	my $mdbook = "$path/SUMMARY.md";
+	open(MD, '>>', $mdbook) or die $!;
 	print MD "# Advent of code\n\n";
 	print MD "- [Advent of code](./$root)\n";
 	close(MD);
