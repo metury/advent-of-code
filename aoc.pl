@@ -161,13 +161,29 @@ sub process_year {
 	}
 }
 
+sub update_summary {
+	my ($file) = @_;
+
+	open(my $in, '<', $file) or die $!;
+	my $content = do { local $/; <$in> };
+	close($in);
+
+	$content =~ s/<!--AOC-->.*<!--AOC-->//sg;
+
+	open(my $out, '>', $file) or die $!;
+	print $out $content;
+	close($out);
+}
+
 # Create all pages.
 sub create_pages {
 	my ($path) = @_;
 	my $aoc_dir = "$path/aoc";
 	my $aoc_file = "$path/$root";
 	my $mdbook = "$path/SUMMARY.md";
+	update_summary($mdbook);
 	open(MD, '>>', $mdbook) or die $!;
+	print MD "<!--AOC-->\n";
 	print MD "# Advent of code\n\n";
 	print MD "- [Advent of code](./$root)\n";
 	close(MD);
@@ -179,6 +195,9 @@ sub create_pages {
 	foreach my $year_dir (@directories) {
 		process_year($aoc_dir, path("$dir/$year_dir"), $aoc_file, $mdbook);
 	}
+	open(MD, '>>', $mdbook) or die $!;
+	print MD "<!--AOC-->";
+	close(MD);
 }
 
 ## =============== ##

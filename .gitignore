@@ -3,7 +3,7 @@ INPUT
 OUTPUT
 aoc/
 adventofcode.md
-mdbook.md
+SUMMARY.md
 target/
 *.lock
 *.dot
