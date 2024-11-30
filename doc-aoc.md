@@ -35,7 +35,7 @@ Also the main strucutre for the files is:
 ```
 
 > [!IMPORTANT]
-> Note that only some languages are implemented. There is **Perl**, **Rust**, **Python** and **CPP**.
+> Note that only some languages are implemented. There is **Perl**, **Rust**, **Python**, **Go** and **CPP**.
 
 ### Page generating
 

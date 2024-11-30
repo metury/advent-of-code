@@ -323,6 +323,27 @@ sub perl_template {
 	system("chmod", "+x", "$year/$written_day/main.pl");
 }
 
+sub go_template {
+	my ($day, $year, $name) = @_;
+	my $written_day = $day;
+	if ($day =~ /^[1-9]$/) {
+		$written_day = "0$day";
+	}
+	mkdir $year;
+	if (path("$year/$written_day")->is_dir()) {
+		die "This project already exists.\n";
+	}
+	mkdir "$year/$written_day";
+	open(FH, '>', "$year/$written_day/main.go") or die $!;
+	print FH "package main\n\n";
+	print FH "import (\n\t"fmt"\n\t"log"\n\t"os"\n)\n\n";
+	print FH "func read_file(file_path string) string {\n\tcontent, err := os.ReadFile(file_path)\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\treturn string(content)\n}\n\n";
+	print FH "func part1() {\n\tvar result int = 0\n\tvar content = read_file("INPUT")\n\tfmt.Println(\"Part 1: \", result)\n}\n\n";
+	print FH "func part2() {\n\tvar result int = 0\n\tvar content = read_file("INPUT")\n\tfmt.Println(\"Part 2: \", result)\n}\n\n";
+	print FH "func main() {\n\tfmt.Println(\"Year $year day $day - $name\")\n\tpart1()\n\tpart2()\n}";
+	close(FH);
+}
+
 sub cpp_template {
 	my ($day, $year, $name) = @_;
 	my $written_day = $day;
@@ -464,6 +485,10 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 	} elsif ($lang =~ /c[+p][+p]/i or $lang =~ /cc/i) {
 		notify_creation("cpp", $name, $day, $year);
 		cpp_template($day, $year, $name);
+		general_template($day, $year);
+	} elsif ($lang =~ /golang/i or $lang =~ /go/i) {
+		notify_creation("go", $name, $day, $year);
+		go_template($day, $year, $name);
 		general_template($day, $year);
 	} else {
 		print "The given language ";
