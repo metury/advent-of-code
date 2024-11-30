@@ -164,6 +164,10 @@ sub process_year {
 sub update_summary {
 	my ($file) = @_;
 
+	if (not -e $file) {
+		open(my $in, '>', $file) or die $!;
+	}
+
 	open(my $in, '<', $file) or die $!;
 	my $content = do { local $/; <$in> };
 	close($in);
@@ -459,7 +463,7 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 } elsif ($ARGV[0] eq "-g" or $ARGV[0] eq "--gitignore") {
 	print "Creating basic `.gitignore` file.\n";
 	open(FH, '>', ".gitignore") or die $!;
-	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n*.o\n*.gch\n";
+	print FH "main\nINPUT\nOUTPUT\naoc/\nadventofcode.md\ntarget/\n*.lock\n*.dot\n*.png\n*.o\n*.gch\n*.svg\n";
 	close(FH);
 } else {
 	print colored("Wrong argument. Nothing was called try using -h or --help.\n", 'cyan bold');
