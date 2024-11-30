@@ -31,6 +31,11 @@ sub print_aoc {
 	print FH "# Advent of code\n\n";
 	print FH "They are my solutions to [advent of code](https://adventofcode.com/) tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.\n";
 	print FH "Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. Also you may consider joining [Reddit](https://www.reddit.com/r/adventofcode/) where you may find useful tips, or help someone.\n\n";
+	close(FH);
+	if (-e "info.md" ) {
+		print_info("info.md", "$name");
+	}
+	open(FH, '>>', $name) or die $!;
 	print FH "### Years\n\n";
 	close(FH);
 }
@@ -45,13 +50,18 @@ sub append_year {
 
 # Print year file.
 sub print_year {
-	my ($name, $year, $mdbook) = @_;
+	my ($name, $year, $mdbook, $year_dir) = @_;
 	open(MD, '>>', $mdbook) or die $!;
 	print MD "\t- [Year $year]($link$year.md)\n";
 	close(MD);
 	open(FH, '>', $name) or die $!;
 	print FH "# Advent of code - Year $year\n\n";
 	print FH "This contains tasks from the [year $year](https://adventofcode.com/$year). Go back to [AOC](../$root).\n\n";
+	close(FH);
+	if (-e "$year_dir/info.md" ) {
+			print_info("$year_dir/info.md", "$name");
+	}
+	open(FH, '>>', $name) or die $!;
 	print FH "### Days\n\n";
 	close(FH);
 }
@@ -149,7 +159,7 @@ sub process_year {
 	if ($year_dir->is_dir() and $year_dir =~ /20[0-9][0-9]/) {
 		my @year_path = (split /\//, $year_dir);
 		my $year = $year_path[@year_path - 1];
-		print_year("$aoc_dir/$year.md", $year, $mdbook);
+		print_year("$aoc_dir/$year.md", $year, $mdbook, $year_dir);
 		append_year("$aoc_file", $year);
 		opendir(DIR, $year_dir) or die $!;
 		my @directories = sort readdir(DIR);
