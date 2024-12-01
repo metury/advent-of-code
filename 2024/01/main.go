@@ -44,7 +44,7 @@ func count(list *[]int) map[int]int {
 }
 
 func part1() {
-	var result int = 0
+	var result int
 	read_file("INPUT")
 	first_column, second_column := read_file("INPUT")
 	for i, _ := range first_column {
@@ -55,7 +55,7 @@ func part1() {
 }
 
 func part2() {
-	var result int = 0
+	var result int
 	first_column, second_column := read_file("INPUT")
 	second_map := count(&second_column)
 	for _, key := range first_column {
