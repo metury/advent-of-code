@@ -33,8 +33,7 @@ func read_file(file_path string) ([]int, []int) {
 func count(list *[]int) map[int]int {
 	my_map := make(map[int]int)
 	for _, val := range *list {
-		i, ok := my_map[val]
-		if ok {
+		if i, ok := my_map[val]; ok {
 			my_map[val] = i + 1
 		} else {
 			my_map[val] = 1
