@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"regexp"
-	"strconv"
 	"sort"
-	"math"
+	"strconv"
 )
 
 func read_file(file_path string) ([]int, []int) {
@@ -19,7 +19,7 @@ func read_file(file_path string) ([]int, []int) {
 	found := (regex.FindAllStringSubmatch(string(content), -1))
 	var first_column []int
 	var second_column []int
-	for _, f := range(found) {
+	for _, f := range found {
 		nr1, _ := strconv.Atoi(f[1])
 		nr2, _ := strconv.Atoi(f[2])
 		first_column = append(first_column, nr1)
@@ -32,7 +32,7 @@ func read_file(file_path string) ([]int, []int) {
 
 func count(list *[]int) map[int]int {
 	my_map := make(map[int]int)
-	for _,val := range *list {
+	for _, val := range *list {
 		i, ok := my_map[val]
 		if ok {
 			my_map[val] = i + 1
@@ -47,7 +47,7 @@ func part1() {
 	var result int = 0
 	read_file("INPUT")
 	first_column, second_column := read_file("INPUT")
-	for i,_ := range first_column {
+	for i, _ := range first_column {
 		difference := math.Abs(float64(first_column[i] - second_column[i]))
 		result += int(difference)
 	}
@@ -61,7 +61,7 @@ func part2() {
 	for _, key := range first_column {
 		i, ok := second_map[key]
 		if ok {
-			result = result + key * i
+			result = result + key*i
 		}
 	}
 	fmt.Println("Part 2: ", result)
