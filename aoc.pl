@@ -9,10 +9,11 @@ use Term::ANSIColor;
 ## == Global constants. == ##
 ## ======================= ##
 
-my $limit_year_low = 2015;
-my $limit_year_high = 2024;
-my $limit_day_low = 1;
-my $limit_day_high = 25;
+our $limit_year_low = 2015;
+our $limit_year_high = 2024;
+our $limit_day_low = 1;
+our $limit_day_high = 25;
+our $default_lang = "go";
 
 ## ================== ##
 ## == Create pages == ##
@@ -442,7 +443,7 @@ if ($ARGV[0] eq "-p" or $ARGV[0] eq "--pages") {
 } elsif ($ARGV[0] eq "-t" or $ARGV[0] eq "--template") {
 	my ($sec, $min, $hour, $day, $month, $year) = localtime(time);
 	$year += 1900;
-	my $lang = "rust";
+	my $lang = $default_lang;
 	if (@ARGV == 2) {
 		$lang = $ARGV[1];
 	} elsif (@ARGV == 3) {
