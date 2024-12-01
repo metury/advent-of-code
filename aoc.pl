@@ -108,7 +108,7 @@ sub print_file {
 sub print_info {
 	my ($info_file, $output) = @_;
 	open(FH, '>>', $output) or die $!;
-	print FH "### Info\n\n";
+	print FH "### Information\n\n";
 	open(IN, '<', $info_file) or die $!;
 	while (<IN>) {
 		print FH $_;
