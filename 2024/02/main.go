@@ -61,18 +61,22 @@ func decreasing(tolerate bool, start int) func(int) bool {
 	return comparing(tolerate, start + 1, less_than)
 }
 
+func increasing_or_decreasing(tolerate bool, level *[]int) bool {
+	i := increasing(tolerate, (*level)[0])
+	d := decreasing(tolerate, (*level)[0])
+	incr, decr := true, true
+	for _, val := range (*level) {
+		incr = incr && i(val)
+		decr = decr && d(val)
+	}
+	return incr || decr
+}
+
 func part1() {
 	var result int
 	levels := read_file("INPUT")
 	for _, level := range levels {
-		i := increasing(false, level[0])
-		d := decreasing(false, level[0])
-		incr, decr := true, true
-		for _, val := range level {
-			incr = incr && i(val)
-			decr = decr && d(val)
-		}
-		if incr || decr {
+		if increasing_or_decreasing(false, &level) {
 			result += 1
 		}
 	}
@@ -83,18 +87,8 @@ func part2() {
 	var result int
 	levels := read_file("INPUT")
 	for _, level := range levels {
-		i, i_without_first := increasing(true, level[0]), increasing(false, level[1])
-		d, d_without_first := decreasing(true, level[0]), decreasing(false, level[1])
-		incr, decr, incr_without_first, decr_without_first := true, true, true, true
-		for _, val := range level {
-			incr = incr && i(val)
-			decr = decr && d(val)
-		}
-		for _, val := range level[1:] {
-			incr_without_first = incr_without_first && i_without_first(val)
-			decr_without_first = decr_without_first && d_without_first(val)
-		}
-		if incr || decr || incr_without_first || decr_without_first {
+		level_without_first := level[1:]
+		if increasing_or_decreasing(true, &level) || increasing_or_decreasing(false, &level_without_first) {
 			result += 1
 		}
 	}
