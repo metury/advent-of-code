@@ -34,14 +34,11 @@ func read_file(file_path string) [][]int {
 func comparing(tolerate bool, start int, compare func(int, int) bool) func(int) bool{
 	current := start
 	last := true
-	tol := 0
-	if tolerate {
-		tol = 1
-	}
+	tol := tolerate
 	return func(x int) bool {
 		diff := int(math.Abs(float64(current - x)))
-		if tol > 0 && (!compare(x, current) || diff > LIMIT) {
-			tol -= 1
+		if tol && (!compare(x, current) || diff > LIMIT) {
+			tol = false
 		} else {
 			last = compare(x, current) && last && diff <= LIMIT
 			current = x
@@ -70,12 +67,12 @@ func part1() {
 	for _, level := range levels {
 		i := increasing(false, level[0])
 		d := decreasing(false, level[0])
-		increasing, decreasing := true, true
+		incr, decr := true, true
 		for _, val := range level {
-			increasing = increasing && i(val)
-			decreasing = decreasing && d(val)
+			incr = incr && i(val)
+			decr = decr && d(val)
 		}
-		if increasing || decreasing {
+		if incr || decr {
 			result += 1
 		}
 	}
@@ -86,18 +83,18 @@ func part2() {
 	var result int
 	levels := read_file("INPUT")
 	for _, level := range levels {
-		i, i2 := increasing(true, level[0]), increasing(false, level[1])
-		d, d2 := decreasing(true, level[0]), decreasing(false, level[1])
-		increasing, decreasing, increasing2, decreasing2 := true, true, true, true
+		i, i_without_first := increasing(true, level[0]), increasing(false, level[1])
+		d, d_without_first := decreasing(true, level[0]), decreasing(false, level[1])
+		incr, decr, incr_without_first, decr_without_first := true, true, true, true
 		for _, val := range level {
-			increasing = increasing && i(val)
-			decreasing = decreasing && d(val)
+			incr = incr && i(val)
+			decr = decr && d(val)
 		}
 		for _, val := range level[1:] {
-			increasing2 = increasing2 && i2(val)
-			decreasing2 = decreasing2 && d2(val)
+			incr_without_first = incr_without_first && i_without_first(val)
+			decr_without_first = decr_without_first && d_without_first(val)
 		}
-		if increasing || decreasing || increasing2 || decreasing2 {
+		if incr || decr || incr_without_first || decr_without_first {
 			result += 1
 		}
 	}
