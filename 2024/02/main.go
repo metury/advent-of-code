@@ -31,7 +31,7 @@ func read_file(file_path string) [][]int {
 	return res
 }
 
-func comparing(tolerate bool, start int, compare func(int, int) bool) func(int) bool{
+func comparing(tolerate bool, start int, compare func(int, int) bool) func(int) bool {
 	current := start
 	last := true
 	tol := tolerate
@@ -51,21 +51,21 @@ func increasing(tolerate bool, start int) func(int) bool {
 	greeater_than := func(x, y int) bool {
 		return x > y
 	}
-	return comparing(tolerate, start - 1, greeater_than)
+	return comparing(tolerate, start-1, greeater_than)
 }
 
 func decreasing(tolerate bool, start int) func(int) bool {
 	less_than := func(x, y int) bool {
 		return x < y
 	}
-	return comparing(tolerate, start + 1, less_than)
+	return comparing(tolerate, start+1, less_than)
 }
 
 func increasing_or_decreasing(tolerate bool, level *[]int) bool {
 	i := increasing(tolerate, (*level)[0])
 	d := decreasing(tolerate, (*level)[0])
 	incr, decr := true, true
-	for _, val := range (*level) {
+	for _, val := range *level {
 		incr = incr && i(val)
 		decr = decr && d(val)
 	}

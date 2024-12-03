@@ -15,8 +15,8 @@ func read_file(file_path string) ([]int, []int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	regex, _ := regexp.Compile("([0-9]+)\\s+([0-9]+)")
-	found := (regex.FindAllStringSubmatch(string(content), -1))
+	regex := regexp.MustCompile("([0-9]+)\\s+([0-9]+)")
+	found := regex.FindAllStringSubmatch(string(content), -1)
 	var first_column []int
 	var second_column []int
 	for _, f := range found {
