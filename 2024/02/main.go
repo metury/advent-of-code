@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const LIMIT int = 3
@@ -74,17 +75,20 @@ func increasing_or_decreasing(tolerate bool, level *[]int) bool {
 
 func part1() {
 	var result int
+	start := time.Now()
 	levels := read_file("INPUT")
 	for _, level := range levels {
 		if increasing_or_decreasing(false, &level) {
 			result += 1
 		}
 	}
-	fmt.Println("Part 1: ", result)
+	end := time.Now()
+	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
 }
 
 func part2() {
 	var result int
+	start := time.Now()
 	levels := read_file("INPUT")
 	for _, level := range levels {
 		level_without_first := level[1:]
@@ -92,7 +96,8 @@ func part2() {
 			result += 1
 		}
 	}
-	fmt.Println("Part 2: ", result)
+	end := time.Now()
+	fmt.Println("Part 2 (", end.Sub(start), "): ", result)
 }
 
 func main() {

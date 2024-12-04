@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 )
 
 func read_file(file_path string) string {
@@ -19,6 +20,7 @@ func read_file(file_path string) string {
 func part1() {
 	var result int
 	var content = read_file("INPUT")
+	start := time.Now()
 	regex := regexp.MustCompile("mul\\(([0-9]{1,3}),([0-9]{1,3})\\)")
 	found := regex.FindAllStringSubmatch(content, -1)
 	for _, f := range found {
@@ -26,12 +28,14 @@ func part1() {
 		nr2, _ := strconv.Atoi(f[2])
 		result += nr1 * nr2
 	}
-	fmt.Println("Part 1: ", result)
+	end := time.Now()
+	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
 }
 
 func part2() {
 	var result int
 	content := read_file("INPUT")
+	start := time.Now()
 	regex := regexp.MustCompile("do\\(\\)|don't\\(\\)|mul\\(([0-9]{1,3}),([0-9]{1,3})\\)")
 	found := regex.FindAllStringSubmatch(content, -1)
 	enabled := true
@@ -49,8 +53,8 @@ func part2() {
 			}
 		}
 	}
-
-	fmt.Println("Part 2: ", result)
+	end := time.Now()
+	fmt.Println("Part 2 (", end.Sub(start), "): ", result)
 }
 
 func main() {

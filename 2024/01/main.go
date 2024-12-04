@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"time"
 )
 
 func read_file(file_path string) ([]int, []int) {
@@ -44,17 +45,19 @@ func count(list *[]int) map[int]int {
 
 func part1() {
 	var result int
-	read_file("INPUT")
+	start := time.Now()
 	first_column, second_column := read_file("INPUT")
 	for i, _ := range first_column {
 		difference := math.Abs(float64(first_column[i] - second_column[i]))
 		result += int(difference)
 	}
-	fmt.Println("Part 1: ", result)
+	end := time.Now()
+	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
 }
 
 func part2() {
 	var result int
+	start := time.Now()
 	first_column, second_column := read_file("INPUT")
 	second_map := count(&second_column)
 	for _, key := range first_column {
@@ -63,7 +66,8 @@ func part2() {
 			result = result + key*i
 		}
 	}
-	fmt.Println("Part 2: ", result)
+	end := time.Now()
+	fmt.Println("Part 2 (", end.Sub(start), "): ", result)
 }
 
 func main() {
