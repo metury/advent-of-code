@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func read_file(file_path string) string {
@@ -16,7 +17,7 @@ func read_file(file_path string) string {
 	return string(content)
 }
 
-/// Create a table from the input.
+// / Create a table from the input.
 func tabelize(text *string) [][]string {
 	lines := strings.Split(*text, "\n")
 	var table [][]string
@@ -28,7 +29,7 @@ func tabelize(text *string) [][]string {
 	return table
 }
 
-/// Transpose the text as a matrix.
+// / Transpose the text as a matrix.
 func transpose(text *string) string {
 	var builder strings.Builder
 	table := tabelize(text)
@@ -41,19 +42,19 @@ func transpose(text *string) string {
 	return builder.String()
 }
 
-/// Create all diagonals of the text.
+// / Create all diagonals of the text.
 func diag(text *string) string {
 	var builder strings.Builder
 	table := tabelize(text)
 	for i := len(table[0]) - 1; i >= 0; i-- {
-		for j := 0; j + i < len(table[0]); j++{
+		for j := 0; j+i < len(table[0]); j++ {
 			builder.WriteString(table[j][j+i])
 		}
 		builder.WriteString("\n")
 	}
 	for i := len(table) - 1; i > 0; i-- {
-		for j := 0; j + i < len(table); j++{
-			builder.WriteString(table[i + j][j])
+		for j := 0; j+i < len(table); j++ {
+			builder.WriteString(table[i+j][j])
 		}
 		builder.WriteString("\n")
 	}
@@ -71,7 +72,7 @@ func swap(text *string) string {
 	return builder.String()
 }
 
-/// Replace all S by SS and X by XX.
+// / Replace all S by SS and X by XX.
 func replace(text *string) string {
 	s := regexp.MustCompile("S")
 	x := regexp.MustCompile("X")
@@ -89,8 +90,8 @@ func count_xmas(text *string) int {
 
 func count_x_mas(table [][]string) int {
 	res := 0
-	for i := 1; i < len(table) - 1; i++ {
-		for j := 1; j < len(table[i]) - 1; j++{
+	for i := 1; i < len(table)-1; i++ {
+		for j := 1; j < len(table[i])-1; j++ {
 			if table[i][j] == "A" {
 				first_word := table[i-1][j-1] + table[i][j] + table[i+1][j+1]
 				second_word := table[i-1][j+1] + table[i][j] + table[i+1][j-1]
@@ -107,6 +108,7 @@ func count_x_mas(table [][]string) int {
 func part1() {
 	var result int
 	var content = read_file("INPUT")
+	start := time.Now()
 	var builder strings.Builder
 	swapped := swap(&content)
 	builder.WriteString(content)
@@ -119,15 +121,18 @@ func part1() {
 	text := builder.String()
 	text = replace(&text)
 	result = count_xmas(&text)
-	fmt.Println("Part 1: ", result)
+	end := time.Now()
+	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
 }
 
 func part2() {
 	var result int
 	var content = read_file("INPUT")
+	start := time.Now()
 	table := tabelize(&content)
 	result = count_x_mas(table)
-	fmt.Println("Part 2: ", result)
+	end := time.Now()
+	fmt.Println("Part 2 (", end.Sub(start), "):", result)
 }
 
 func main() {
