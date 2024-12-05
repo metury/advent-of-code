@@ -33,8 +33,8 @@ func tabelize(text *string) [][]string {
 func transpose(text *string) string {
 	var builder strings.Builder
 	table := tabelize(text)
-	for i, _ := range table[0] {
-		for j, _ := range table {
+	for i := range table[0] {
+		for j := range table {
 			builder.WriteString(string(table[j][i]))
 		}
 		builder.WriteString("\n")
@@ -122,7 +122,7 @@ func part1() {
 	text = replace(&text)
 	result = count_xmas(&text)
 	end := time.Now()
-	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
 func part2() {
@@ -132,7 +132,7 @@ func part2() {
 	table := tabelize(&content)
 	result = count_x_mas(table)
 	end := time.Now()
-	fmt.Println("Part 2 (", end.Sub(start), "):", result)
+	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
 
 func main() {

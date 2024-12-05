@@ -29,7 +29,7 @@ func part1() {
 		result += nr1 * nr2
 	}
 	end := time.Now()
-	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
 func part2() {
@@ -54,7 +54,7 @@ func part2() {
 		}
 	}
 	end := time.Now()
-	fmt.Println("Part 2 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
 
 func main() {

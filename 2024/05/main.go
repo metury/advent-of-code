@@ -103,7 +103,7 @@ func part1() {
 		result += cor[len(cor)/2]
 	}
 	end := time.Now()
-	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
 func part2() {
@@ -115,7 +115,7 @@ func part2() {
 		result += fix(rules, inc)[len(inc)/2]
 	}
 	end := time.Now()
-	fmt.Println("Part 2 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
 
 func main() {

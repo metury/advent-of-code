@@ -47,12 +47,12 @@ func part1() {
 	var result int
 	start := time.Now()
 	first_column, second_column := read_file("INPUT")
-	for i, _ := range first_column {
+	for i := range first_column {
 		difference := math.Abs(float64(first_column[i] - second_column[i]))
 		result += int(difference)
 	}
 	end := time.Now()
-	fmt.Println("Part 1 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
 func part2() {
@@ -67,7 +67,7 @@ func part2() {
 		}
 	}
 	end := time.Now()
-	fmt.Println("Part 2 (", end.Sub(start), "): ", result)
+	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
 
 func main() {
