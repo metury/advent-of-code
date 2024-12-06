@@ -11,6 +11,8 @@ import (
 type Map [][]bool
 type Position [2]int
 
+var INVALID_POSITION [2]int = [2]int{-1, -1}
+
 func read_file(file_path string) (Map, Position) {
 	content, err := os.ReadFile(file_path)
 	if err != nil {
@@ -40,15 +42,17 @@ func read_file(file_path string) (Map, Position) {
 	return m, pos
 }
 
-func guard_step(m Map, pos Position, step Position) (Position, Position, bool) {
+func guard_step(m Map, pos Position, step Position, obstacle Position) (Position, Position, bool) {
 	new_pos := [2]int{pos[0] + step[0], pos[1] + step[1]}
 	inside := new_pos[0] < len(m) && new_pos[0] >= 0 && new_pos[1] < len(m[0]) && new_pos[1] >= 0
-	if inside && m[new_pos[0]][new_pos[1]] {
-		return new_pos, step, inside
-	} else if inside {
-		step[0], step[1] = step[1], -step[0]
-		inside := pos[0] < len(m) && pos[0] >= 0 && pos[1] < len(m[0]) && pos[1] >= 0
-		return pos, step, inside
+	if inside {
+		in_map := m[new_pos[0]][new_pos[1]] && (new_pos[0] != obstacle[0] || new_pos[1] != obstacle[1])
+		if in_map {
+			return new_pos, step, true
+		} else {
+			step[0], step[1] = step[1], -step[0]
+			return pos, step, true
+		}
 	} else {
 		return new_pos, step, false
 	}
@@ -61,26 +65,26 @@ func found_visited(m Map, pos Position) Map {
 	}
 	visited[pos[0]][pos[1]] = true
 	step := [2]int{-1, 0}
-	pos, step, ok := guard_step(m, pos, step)
+	pos, step, ok := guard_step(m, pos, step, INVALID_POSITION)
 	for ok {
 		visited[pos[0]][pos[1]] = true
-		pos, step, ok = guard_step(m, pos, step)
+		pos, step, ok = guard_step(m, pos, step, INVALID_POSITION)
 	}
 	return visited
 }
 
-func is_loop(m Map, pos Position) bool {
+func is_loop(m Map, pos Position, obstacle Position, c chan bool) {
 	visited := make(map[[4]int]bool)
 	step := [2]int{-1, 0}
 	visited[[4]int{pos[0], pos[1], step[0], step[1]}] = true
-	pos, step, ok := guard_step(m, pos, step)
-	_, hash_ok := visited[[4]int{pos[0], pos[1], step[0], step[1]}]
+	pos, step, ok := guard_step(m, pos, step, obstacle)
+	hash_ok := false
 	for ok && !hash_ok {
 		_, hash_ok = visited[[4]int{pos[0], pos[1], step[0], step[1]}]
 		visited[[4]int{pos[0], pos[1], step[0], step[1]}] = true
-		pos, step, ok = guard_step(m, pos, step)
+		pos, step, ok = guard_step(m, pos, step, obstacle)
 	}
-	return hash_ok
+	c <- hash_ok
 }
 
 func part1() {
@@ -112,14 +116,15 @@ func part2() {
 			}
 		}
 	}
+	c := make(chan bool)
 	for _, obstacle := range visited_pos {
-		m[obstacle[0]][obstacle[1]] = false
-		if is_loop(m, pos) {
+		go is_loop(m, pos, obstacle, c)
+	}
+	for i := 0; i < len(visited_pos); i++ {
+		if <-c {
 			result += 1
 		}
-		m[obstacle[0]][obstacle[1]] = true
 	}
-
 	end := time.Now()
 	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
