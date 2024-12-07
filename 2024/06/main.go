@@ -125,6 +125,7 @@ func part2() {
 			result += 1
 		}
 	}
+	close(c)
 	end := time.Now()
 	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
