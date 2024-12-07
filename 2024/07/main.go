@@ -10,7 +10,7 @@ import (
 )
 
 type Equation struct {
-	result   int
+	result int
 	operands []int
 }
 
@@ -42,24 +42,24 @@ func concat(x int, y int) int {
 	return res
 }
 
-func solve(eq Equation, acc int, i int) bool {
-	if i < len(eq.operands) && acc > eq.result {
+func solve(eq Equation, part int, i int) bool{
+	if i < len(eq.operands) && part > eq.result {
 		return false
 	}
 	if i == len(eq.operands) {
-		return eq.result == acc
+		return eq.result == part
 	}
-	return solve(eq, acc+eq.operands[i], i+1) || solve(eq, acc*eq.operands[i], i+1)
+	return solve(eq, part + eq.operands[i], i+1) || solve(eq, part * eq.operands[i], i+1)
 }
 
-func solve_concat(eq Equation, acc int, i int) bool {
-	if i < len(eq.operands) && acc > eq.result {
+func solve_concat(eq Equation, part int, i int) bool {
+	if i < len(eq.operands) && part > eq.result {
 		return false
 	}
 	if i == len(eq.operands) {
-		return eq.result == acc
+		return eq.result == part
 	}
-	return solve_concat(eq, acc+eq.operands[i], i+1) || solve_concat(eq, acc*eq.operands[i], i+1) || solve_concat(eq, concat(acc, eq.operands[i]), i+1)
+	return solve_concat(eq, part + eq.operands[i], i+1) || solve_concat(eq, part * eq.operands[i], i+1) || solve_concat(eq, concat(part, eq.operands[i]), i+1)
 }
 
 func common_solve(eq Equation, solver func(Equation, int, int) bool, c chan int) {
