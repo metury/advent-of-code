@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-type Instruction struct{
+type Instruction struct {
 	instruction string
-	value int
+	value       int
 }
 
 func read_file(file_path string) []Instruction {
@@ -33,12 +33,12 @@ func compute(instructions []Instruction) int {
 	depth, forward := 0, 0
 	for _, instruction := range instructions {
 		switch instruction.instruction {
-			case "up":
-				depth -= instruction.value
-			case "down":
-				depth += instruction.value
-			case "forward":
-				forward += instruction.value
+		case "up":
+			depth -= instruction.value
+		case "down":
+			depth += instruction.value
+		case "forward":
+			forward += instruction.value
 		}
 	}
 	return depth * forward
@@ -48,13 +48,13 @@ func compute_aim(instructions []Instruction) int {
 	depth, forward, aim := 0, 0, 0
 	for _, instruction := range instructions {
 		switch instruction.instruction {
-			case "up":
-				aim -= instruction.value
-			case "down":
-				aim += instruction.value
-			case "forward":
-				forward += instruction.value;
-				depth += aim * instruction.value;
+		case "up":
+			aim -= instruction.value
+		case "down":
+			aim += instruction.value
+		case "forward":
+			forward += instruction.value
+			depth += aim * instruction.value
 		}
 	}
 	return depth * forward
