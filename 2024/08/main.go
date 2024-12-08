@@ -41,7 +41,7 @@ func is_in_map(pos Position, size int) bool {
 	return pos[0] >= 0 && pos[1] >= 0 && pos[0] < size && pos[1] < size
 }
 
-func add_antinode(nodes *map[[2]int]bool, antenna, diff Position, op func(int, int) int, size int, first_only bool) {
+func add_antinodes(nodes *map[[2]int]bool, antenna, diff Position, op func(int, int) int, size int, first_only bool) {
 	antinode := [2]int{op(antenna[0], diff[0]), op(antenna[1], diff[1])}
 	for is_in_map(antinode, size) {
 		(*nodes)[antinode] = true
@@ -60,8 +60,8 @@ func add_nodes(nodes *map[[2]int]bool, first_antenna, second_antenna Position, s
 	}
 	add := func(x int, y int) int {return x + y;}
 	sub := func(x int, y int) int {return x - y;}
-	add_antinode(nodes, first_antenna, diff, add, size, first_only)
-	add_antinode(nodes, second_antenna, diff, sub, size, first_only)
+	add_antinodes(nodes, first_antenna, diff, add, size, first_only)
+	add_antinodes(nodes, second_antenna, diff, sub, size, first_only)
 }
 
 func part1() {
