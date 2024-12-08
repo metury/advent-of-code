@@ -42,7 +42,7 @@ func read_file(file_path string) (Map, Position) {
 	return m, pos
 }
 
-func guard_step(m Map, pos Position, step Position, obstacle Position) (Position, Position, bool) {
+func guard_step(m Map, pos, step, obstacle Position) (Position, Position, bool) {
 	new_pos := [2]int{pos[0] + step[0], pos[1] + step[1]}
 	inside := new_pos[0] < len(m) && new_pos[0] >= 0 && new_pos[1] < len(m[0]) && new_pos[1] >= 0
 	if inside {
@@ -73,7 +73,7 @@ func found_visited(m Map, pos Position) Map {
 	return visited
 }
 
-func is_loop(m Map, pos Position, obstacle Position, c chan bool) {
+func is_loop(m Map, pos, obstacle Position, c chan bool) {
 	visited := make(map[[4]int]bool)
 	step := [2]int{-1, 0}
 	visited[[4]int{pos[0], pos[1], step[0], step[1]}] = true

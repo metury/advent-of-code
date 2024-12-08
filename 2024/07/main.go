@@ -37,12 +37,12 @@ func read_file(file_path string) []Equation {
 	return equations
 }
 
-func concat(x int, y int) int {
+func concat(x, y int) int {
 	res, _ := strconv.Atoi(strconv.Itoa(x) + strconv.Itoa(y))
 	return res
 }
 
-func solve(eq Equation, acc int, i int) bool{
+func solve(eq Equation, acc, i int) bool{
 	if i < len(eq.operands) && acc > eq.result {
 		return false
 	}
@@ -52,7 +52,7 @@ func solve(eq Equation, acc int, i int) bool{
 	return solve(eq, acc + eq.operands[i], i+1) || solve(eq, acc * eq.operands[i], i+1)
 }
 
-func solve_concat(eq Equation, acc int, i int) bool {
+func solve_concat(eq Equation, acc, i int) bool {
 	if i < len(eq.operands) && acc > eq.result {
 		return false
 	}
