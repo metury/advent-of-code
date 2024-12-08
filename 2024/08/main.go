@@ -29,7 +29,7 @@ func read_file(file_path string) (map[string][]Position, int) {
 				if ok {
 					m[c] = append(val, [2]int{i, j})
 				} else {
-					m[c] = []Position{[2]int{i,j}}
+					m[c] = []Position{[2]int{i, j}}
 				}
 			}
 		}
@@ -58,8 +58,8 @@ func add_nodes(nodes *map[[2]int]bool, first_antenna, second_antenna Position, s
 		(*nodes)[first_antenna] = true
 		(*nodes)[second_antenna] = true
 	}
-	add := func(x int, y int) int {return x + y;}
-	sub := func(x int, y int) int {return x - y;}
+	add := func(x int, y int) int { return x + y }
+	sub := func(x int, y int) int { return x - y }
 	add_antinodes(nodes, first_antenna, diff, add, size, first_only)
 	add_antinodes(nodes, second_antenna, diff, sub, size, first_only)
 }
@@ -70,8 +70,8 @@ func part1() {
 	m, size := read_file("INPUT")
 	nodes := make(map[[2]int]bool)
 	for _, antennas := range m {
-		for i := 0; i < len(antennas) -1; i++ {
-			for j := i + 1; j < len(antennas); j++{
+		for i := 0; i < len(antennas)-1; i++ {
+			for j := i + 1; j < len(antennas); j++ {
 				add_nodes(&nodes, antennas[i], antennas[j], size, true)
 			}
 		}
@@ -87,8 +87,8 @@ func part2() {
 	m, size := read_file("INPUT")
 	nodes := make(map[[2]int]bool)
 	for _, antennas := range m {
-		for i := 0; i < len(antennas) -1; i++ {
-			for j := i + 1; j < len(antennas); j++{
+		for i := 0; i < len(antennas)-1; i++ {
+			for j := i + 1; j < len(antennas); j++ {
 				add_nodes(&nodes, antennas[i], antennas[j], size, false)
 			}
 		}
