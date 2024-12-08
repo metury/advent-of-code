@@ -41,23 +41,38 @@ func is_in_map(pos Position, size int) bool {
 	return pos[0] >= 0 && pos[1] >= 0 && pos[0] < size && pos[1] < size
 }
 
+func add_antinode(nodes *map[[2]int]bool, antenna, diff Position, op func(int, int) int, size int, first_only bool) {
+	antinode := [2]int{op(antenna[0], diff[0]), op(antenna[1], diff[1])}
+	for is_in_map(antinode, size) {
+		(*nodes)[antinode] = true
+		if first_only {
+			return
+		}
+		antinode = [2]int{op(antinode[0], diff[0]), op(antinode[1], diff[1])}
+	}
+}
+
+func add_nodes(nodes *map[[2]int]bool, first_antenna, second_antenna Position, size int, first_only bool) {
+	diff := [2]int{first_antenna[0] - second_antenna[0], first_antenna[1] - second_antenna[1]}
+	if !first_only {
+		(*nodes)[first_antenna] = true
+		(*nodes)[second_antenna] = true
+	}
+	add := func(x int, y int) int {return x + y;}
+	sub := func(x int, y int) int {return x - y;}
+	add_antinode(nodes, first_antenna, diff, add, size, first_only)
+	add_antinode(nodes, second_antenna, diff, sub, size, first_only)
+}
+
 func part1() {
 	var result int
 	start := time.Now()
 	m, size := read_file("INPUT")
 	nodes := make(map[[2]int]bool)
-	for _, antenas := range m {
-		for i := 0; i < len(antenas) -1; i++ {
-			for j := i + 1; j < len(antenas); j++{
-				diff := [2]int{antenas[i][0] - antenas[j][0], antenas[i][1] - antenas[j][1]}
-				first_antinode := [2]int{antenas[i][0] + diff[0], antenas[i][1] + diff[1]}
-				second_antinode := [2]int{antenas[j][0] - diff[0], antenas[j][1] - diff[1]}
-				if is_in_map(first_antinode, size) {
-					nodes[first_antinode] = true
-				}
-				if is_in_map(second_antinode, size) {
-					nodes[second_antinode] = true
-				}
+	for _, antennas := range m {
+		for i := 0; i < len(antennas) -1; i++ {
+			for j := i + 1; j < len(antennas); j++{
+				add_nodes(&nodes, antennas[i], antennas[j], size, true)
 			}
 		}
 	}
@@ -71,22 +86,10 @@ func part2() {
 	start := time.Now()
 	m, size := read_file("INPUT")
 	nodes := make(map[[2]int]bool)
-	for _, antenas := range m {
-		for i := 0; i < len(antenas) -1; i++ {
-			for j := i + 1; j < len(antenas); j++{
-				diff := [2]int{antenas[i][0] - antenas[j][0], antenas[i][1] - antenas[j][1]}
-				nodes[antenas[i]] = true
-				nodes[antenas[j]] = true
-				first_antinode := [2]int{antenas[i][0] + diff[0], antenas[i][1] + diff[1]}
-				for is_in_map(first_antinode, size) {
-					nodes[first_antinode] = true
-					first_antinode = [2]int{first_antinode[0] + diff[0], first_antinode[1] + diff[1]}
-				}
-				second_antinode := [2]int{antenas[j][0] - diff[0], antenas[j][1] - diff[1]}
-				for is_in_map(second_antinode, size) {
-					nodes[second_antinode] = true
-					second_antinode = [2]int{second_antinode[0] - diff[0], second_antinode[1] - diff[1]}
-				}
+	for _, antennas := range m {
+		for i := 0; i < len(antennas) -1; i++ {
+			for j := i + 1; j < len(antennas); j++{
+				add_nodes(&nodes, antennas[i], antennas[j], size, false)
 			}
 		}
 	}
