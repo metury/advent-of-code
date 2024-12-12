@@ -11,16 +11,15 @@ import (
 )
 
 const (
-	HORIZONTAL = 0
-	VERTICAL = 1
-	UP = 2
-	DOWN = 3
+	UPPER = 0
+	LOWER = 2
+	LEFT  = 1
+	RIGHT = 3
 )
 
 type Fence struct {
 	position [2]int
-	orientation int
-	side int
+	side     int
 }
 
 func read_file(file_path string) [][]string {
@@ -41,67 +40,53 @@ func read_file(file_path string) [][]string {
 	return m
 }
 
-func check_similarity(considered *map[[2]int]bool, array *[]int, current, fence Fence, index, orientation int) {
-	_, ok := (*considered)[[2]int{current.position[index], current.side}]
-	if current.position[index] == fence.position[index] && !ok && current.orientation == orientation && fence.orientation == orientation && current.side == fence.side {
-		*array = append(*array, fence.position[(index + 1) % 2])
-	}
-}
-
-func count_sides(array []int) int {
-	sum := 0
-	sort.Ints(array)
-	for j := 1; j < len(array); j++ {
-		if int(math.Abs(float64(array[j - 1] - array[j]))) > 1 {
-			sum += 1
-		}
-	}
-	if len(array) > 0 {
-		sum += 1
-	}
-	return sum
-}
-
-func filter_count(fences map[Fence]bool) int {
-	considered_vertical := make(map[[2]int]bool)
-	considered_horizontal := make(map[[2]int]bool)
+func count_sides(fences map[Fence]bool) int {
+	considered := make(map[[2]int]bool)
 	sum := 0
 	for current := range fences {
-		vertical := make([]int, 0)
-		horizontal := make([]int, 0)
+		i := current.side % 2
+		_, used := considered[[2]int{current.position[i], current.side}]
+		if used {
+			continue
+		}
+		array := make([]int, 0)
 		for fence := range fences {
-			check_similarity(&considered_vertical, &vertical, current, fence, 0, VERTICAL)
-			check_similarity(&considered_horizontal, &horizontal, current, fence, 1, HORIZONTAL)
+			if current.side == fence.side && current.position[i] == fence.position[i] {
+				array = append(array, fence.position[(i+1)%2])
+			}
 		}
-		if current.orientation == VERTICAL {
-			considered_vertical[[2]int{current.position[0], current.side}] = true
-		} else {
-			considered_horizontal[[2]int{current.position[1], current.side}] = true
+		considered[[2]int{current.position[i], current.side}] = true
+		sort.Ints(array)
+		for j := 1; j < len(array); j++ {
+			if int(math.Abs(float64(array[j-1]-array[j]))) > 1 {
+				sum += 1
+			}
 		}
-		sum += count_sides(horizontal) + count_sides(vertical)
+		if len(array) > 0 {
+			sum += 1
+		}
 	}
 	return sum
 }
 
 func insert_fence(fences *map[Fence]bool, current, neigh [2]int) {
-	if  neigh[0] == current[0] {
+	if neigh[0] == current[0] {
 		if neigh[1] < current[1] {
-			(*fences)[Fence{position: neigh, orientation: HORIZONTAL, side: UP}] = true
+			(*fences)[Fence{position: neigh, side: RIGHT}] = true
 		} else {
-			(*fences)[Fence{position: neigh, orientation: HORIZONTAL, side: DOWN}] = true
+			(*fences)[Fence{position: neigh, side: LEFT}] = true
 		}
 	} else {
 		if neigh[0] < current[0] {
-			(*fences)[Fence{position: neigh, orientation: VERTICAL, side: UP}] = true
+			(*fences)[Fence{position: neigh, side: UPPER}] = true
 		} else {
-			(*fences)[Fence{position: neigh, orientation: VERTICAL, side: DOWN}] = true
+			(*fences)[Fence{position: neigh, side: LOWER}] = true
 		}
 	}
 }
 
-func bucket(garden *[][]string, visited_map *map[[2]int]bool, i, j int) (map[Fence]bool, map[[2]int]bool) {
-	var queue [][2]int
-	queue = append(queue, [2]int{i,j})
+func flood_fill(garden *[][]string, visited_map *map[[2]int]bool, i, j int) (map[Fence]bool, map[[2]int]bool) {
+	queue := append(make([][2]int, 0), [2]int{i, j})
 	fences := make(map[Fence]bool)
 	inner := make(map[[2]int]bool)
 
@@ -109,7 +94,7 @@ func bucket(garden *[][]string, visited_map *map[[2]int]bool, i, j int) (map[Fen
 		current := queue[0]
 		inner[current] = true
 		queue = queue[1:]
-		neighbours := [4][2]int {
+		neighbours := [4][2]int{
 			{current[0] - 1, current[1]},
 			{current[0] + 1, current[1]},
 			{current[0], current[1] + 1},
@@ -136,43 +121,43 @@ func bucket(garden *[][]string, visited_map *map[[2]int]bool, i, j int) (map[Fen
 	return fences, inner
 }
 
-func count_fence(garden *[][]string, f func(map[Fence]bool) int) int {
+func count_fences(garden *[][]string, f func(map[Fence]bool) int) int {
 	sum := 0
 	visited := make(map[[2]int]bool)
 	for i, row := range *garden {
 		for j := range row {
-			_, ok := visited[[2]int{i,j}]
+			_, ok := visited[[2]int{i, j}]
 			if ok {
 				continue
 			}
-			fences, inner := bucket(garden, &visited, i, j)
+			fences, inner := flood_fill(garden, &visited, i, j)
 			sum += len(inner) * f(fences)
 		}
 	}
 	return sum
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	garden := read_file("INPUT")
-	my_len := func(m map[Fence]bool) int { return len(m); }
-	result = count_fence(&garden, my_len)
+	my_len := func(m map[Fence]bool) int { return len(m) }
+	result = count_fences(&garden, my_len)
 	end := time.Now()
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	garden := read_file("INPUT")
-	result = count_fence(&garden, filter_count)
+	result = count_fences(&garden, count_sides)
 	end := time.Now()
 	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
 
 func main() {
 	fmt.Println("Year 2024 day 12 - Garden Groups")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }
