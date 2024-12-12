@@ -73,7 +73,7 @@ func increasing_or_decreasing(tolerate bool, level *[]int) bool {
 	return incr || decr
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	levels := read_file("INPUT")
@@ -86,7 +86,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	levels := read_file("INPUT")
@@ -102,6 +102,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 2 - Red-Nosed Reports")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

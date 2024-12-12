@@ -43,7 +43,7 @@ func count(list *[]int) map[int]int {
 	return my_map
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	first_column, second_column := read_file("INPUT")
@@ -55,7 +55,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	first_column, second_column := read_file("INPUT")
@@ -72,6 +72,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 1 - Historian Hysteria")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

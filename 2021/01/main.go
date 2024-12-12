@@ -38,7 +38,7 @@ func slide(start []int) func(int) bool {
 	}
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	array := read_file("INPUT")
@@ -52,7 +52,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	array := read_file("INPUT")
@@ -68,6 +68,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2021 day 1 - Sonar Sweep")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

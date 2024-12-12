@@ -70,7 +70,7 @@ func common_solve(eq Equation, solver func(Equation, int, int) bool, c chan int)
 	}
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	equations := read_file("INPUT")
@@ -86,7 +86,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	equations := read_file("INPUT")
@@ -104,6 +104,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 7 - Bridge Repair")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

@@ -94,7 +94,7 @@ func fix(rules map[int][]int, order []int) []int {
 	return order
 }
 
-func part1() {
+func part_one() {
 	var result int
 	rules, orders := read_file("INPUT")
 	start := time.Now()
@@ -106,7 +106,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	rules, orders := read_file("INPUT")
 	start := time.Now()
@@ -120,6 +120,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 5 - Print Queue")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

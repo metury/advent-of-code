@@ -75,7 +75,7 @@ func find_distinct(m *[][]int, x, y int) int {
 	return res
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	m := read_file("INPUT")
@@ -90,7 +90,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	m := read_file("INPUT")
@@ -107,6 +107,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 10 - Hoof It")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

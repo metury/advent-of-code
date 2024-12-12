@@ -64,7 +64,7 @@ func add_nodes(nodes *map[[2]int]bool, first_antenna, second_antenna Position, s
 	add_antinodes(nodes, second_antenna, diff, sub, size, first_only)
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	m, size := read_file("INPUT")
@@ -81,7 +81,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	m, size := read_file("INPUT")
@@ -100,6 +100,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 8 - Resonant Collinearity")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

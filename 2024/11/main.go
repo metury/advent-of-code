@@ -77,7 +77,7 @@ func count_all(iter int) int {
 	return blink182(m, iter)
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	result = count_all(25)
@@ -85,7 +85,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	result = count_all(75)
@@ -95,6 +95,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2024 day 11 - Plutonian Pebbles")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }

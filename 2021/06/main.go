@@ -40,7 +40,7 @@ func simulate_life(lanternfish [9]int, days int) int {
 	return sum
 }
 
-func part1() {
+func part_one() {
 	var result int
 	start := time.Now()
 	lanternfish := read_file("INPUT")
@@ -49,7 +49,7 @@ func part1() {
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
 
-func part2() {
+func part_two() {
 	var result int
 	start := time.Now()
 	lanternfish := read_file("INPUT")
@@ -60,6 +60,6 @@ func part2() {
 
 func main() {
 	fmt.Println("Year 2021 day 6 - Lanternfish")
-	part1()
-	part2()
+	part_one()
+	part_two()
 }
