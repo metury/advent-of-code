@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -42,25 +43,39 @@ func read_file(file_path string) []Machine {
 	return machines
 }
 
-func solve(machine Machine) int {
+func solve(machine Machine, c chan int) {
 	y := (machine.prize[1]*machine.a[0] - machine.a[1]*machine.prize[0]) / (machine.b[1]*machine.a[0] - machine.a[1]*machine.b[0])
 	x := (machine.prize[0] - (machine.b[0] * y)) / machine.a[0]
 	if x*machine.a[0]+y*machine.b[0] == machine.prize[0] && x*machine.a[1]+y*machine.b[1] == machine.prize[1] {
-		return x*3 + y
+		c <- x*3 + y
 	}
-	return Invalid
+}
+
+func solve_all(machines []Machine, addition int) int {
+	sum := 0
+	c := make(chan int, len(machines))
+	var wg sync.WaitGroup
+	wg.Add(len(machines))
+	for _, machine := range machines {
+		machine.prize[0] += addition
+		machine.prize[1] += addition
+		go func(machine Machine) {
+			defer wg.Done()
+			solve(machine, c)
+		}(machine)
+	}
+	wg.Wait()
+	close(c)
+	for opt := range c{
+		sum += opt
+	}
+	return sum
 }
 
 func part_one() {
 	var result int
 	start := time.Now()
-	machines := read_file("INPUT")
-	for _, machine := range machines {
-		opt := solve(machine)
-		if opt != Invalid {
-			result += opt
-		}
-	}
+	result = solve_all(read_file("INPUT"), 0)
 	end := time.Now()
 	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
 }
@@ -68,15 +83,7 @@ func part_one() {
 func part_two() {
 	var result int
 	start := time.Now()
-	machines := read_file("INPUT")
-	for _, machine := range machines {
-		machine.prize[0] += 10000000000000
-		machine.prize[1] += 10000000000000
-		opt := solve(machine)
-		if opt != Invalid {
-			result += opt
-		}
-	}
+	result = solve_all(read_file("INPUT"), 10_000_000_000_000)
 	end := time.Now()
 	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
