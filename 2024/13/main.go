@@ -42,11 +42,11 @@ func read_file(file_path string) []Machine {
 	return machines
 }
 
-func optimize(machine Machine) int {
-	j := (machine.prize[1]*machine.a[0] - machine.a[1]*machine.prize[0]) / (machine.b[1]*machine.a[0] - machine.a[1]*machine.b[0])
-	i := (machine.prize[0] - (machine.b[0] * j)) / machine.a[0]
-	if i*machine.a[0]+j*machine.b[0] == machine.prize[0] && i*machine.a[1]+j*machine.b[1] == machine.prize[1] {
-		return i*3 + j
+func solve(machine Machine) int {
+	y := (machine.prize[1]*machine.a[0] - machine.a[1]*machine.prize[0]) / (machine.b[1]*machine.a[0] - machine.a[1]*machine.b[0])
+	x := (machine.prize[0] - (machine.b[0] * y)) / machine.a[0]
+	if x*machine.a[0]+y*machine.b[0] == machine.prize[0] && x*machine.a[1]+y*machine.b[1] == machine.prize[1] {
+		return x*3 + y
 	}
 	return Invalid
 }
@@ -56,7 +56,7 @@ func part_one() {
 	start := time.Now()
 	machines := read_file("INPUT")
 	for _, machine := range machines {
-		opt := optimize(machine)
+		opt := solve(machine)
 		if opt != Invalid {
 			result += opt
 		}
@@ -72,7 +72,7 @@ func part_two() {
 	for _, machine := range machines {
 		machine.prize[0] += 10000000000000
 		machine.prize[1] += 10000000000000
-		opt := optimize(machine)
+		opt := solve(machine)
 		if opt != Invalid {
 			result += opt
 		}
