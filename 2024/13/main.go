@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-const Invalid = -1
-
 type Machine struct {
 	a     [2]int
 	b     [2]int
