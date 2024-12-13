@@ -83,7 +83,7 @@ func part_one() {
 func part_two() {
 	var result int
 	start := time.Now()
-	result = solve_all(read_file("INPUT"), 10_000_000_000_000)
+	result = solve_all(read_file("INPUT"), 10000000000000)
 	end := time.Now()
 	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
 }
