@@ -20,7 +20,7 @@ Which can be simplified to evaluate the following:
   x = \frac{p_0 - b_0 y}{a_0}
 \\]
 
-Lastly we check if it is indeed true.
+Lastly we check if it is indeed true. Note that we assume that the vectors are linearly independent.
 
 #### Part 2
 
