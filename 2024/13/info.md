@@ -17,7 +17,7 @@ Which can be simplified to evaluate the following:
 \\]
 
 \\[
-  x = \frac{p_0 - b_0 x}{a_0}
+  x = \frac{p_0 - b_0 y}{a_0}
 \\]
 
 Lastly we check if it is indeed true.
