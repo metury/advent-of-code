@@ -338,10 +338,12 @@ sub go_template {
 	open(FH, '>', "$year/$written_day/main.go") or die $!;
 	print FH "package main\n\n";
 	print FH "import (\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\t\"regexp\"\n\t\"strconv\"\n\t\"time\"\n)\n\n";
+	print FH "const (\n\tBlue   = \"\033[1;34m\"\n\tYellow = \"\033[1;33m\"\n\tGreen  = \"\033[1;32m\"\n\tReset  = \"\033[0m\"\n)\n\n";
+	print FH"func print_result(dur time.Duration, part, result int) {\n\tfmt.Println(\"Part \" + fmt.Sprint(part) + \" [\" + Blue + fmt.Sprint(dur) + Reset + \"]: \" + Yellow + fmt.Sprint(result) + Reset)\n}\n\n";
 	print FH "func read_file(file_path string) string {\n\tcontent, err := os.ReadFile(file_path)\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\treturn string(content)\n}\n\n";
-	print FH "func part_one() {\n\tvar result int\n\tstart := time.Now()\n\tend := time.Now()\n\tfmt.Println(\"Part 1 [\", end.Sub(start), \"]:\", result)\n}\n\n";
-	print FH "func part_two() {\n\tvar result int\n\tstart := time.Now()\n\tend := time.Now()\n\tfmt.Println(\"Part 2 [\", end.Sub(start), \"]:\", result)\n}\n\n";
-	print FH "func main() {\n\tfmt.Println(\"Year $year day $day - $name\")\n\tpart_one()\n\tpart_two()\n}";
+	print FH "func part_one() {\n\tvar result int\n\tstart := time.Now()\n\tend := time.Now()\n\tprint_result(end.Sub(start), 1, result)\n}\n\n";
+	print FH "func part_two() {\n\tvar result int\n\tstart := time.Now()\n\tend := time.Now()\n\tprint_result(end.Sub(start), 2, result)\n}\n\n";
+	print FH "func main() {\n\tfmt.Println(\"Year \" + Green + \"$year\" + Reset + \" day \" + Green + \"$day - Claw Contraption\" + Reset)\n\tpart_one()\n\tpart_two()\n}";
 	close(FH);
 }
 
