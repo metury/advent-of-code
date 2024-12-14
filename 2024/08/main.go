@@ -8,6 +8,17 @@ import (
 	"time"
 )
 
+const (
+	Blue   = "\033[1;34m"
+	Yellow = "\033[1;33m"
+	Green  = "\033[1;32m"
+	Reset  = "\033[0m"
+)
+
+func print_result(dur time.Duration, part, result int) {
+	fmt.Println("Part " + fmt.Sprint(part) + " [" + Blue + fmt.Sprint(dur) + Reset + "]: " + Yellow + fmt.Sprint(result) + Reset)
+}
+
 type Position [2]int
 
 func read_file(file_path string) (map[string][]Position, int) {
@@ -78,7 +89,7 @@ func part_one() {
 	}
 	result = len(nodes)
 	end := time.Now()
-	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
+	print_result(end.Sub(start), 1, result)
 }
 
 func part_two() {
@@ -95,11 +106,11 @@ func part_two() {
 	}
 	result = len(nodes)
 	end := time.Now()
-	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
+	print_result(end.Sub(start), 2, result)
 }
 
 func main() {
-	fmt.Println("Year 2024 day 8 - Resonant Collinearity")
+	fmt.Println("Year " + Green + "2024" + Reset + " day " + Green + "8 - Resonant Collinearity" + Reset)
 	part_one()
 	part_two()
 }

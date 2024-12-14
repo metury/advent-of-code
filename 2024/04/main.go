@@ -9,6 +9,17 @@ import (
 	"time"
 )
 
+const (
+	Blue   = "\033[1;34m"
+	Yellow = "\033[1;33m"
+	Green  = "\033[1;32m"
+	Reset  = "\033[0m"
+)
+
+func print_result(dur time.Duration, part, result int) {
+	fmt.Println("Part " + fmt.Sprint(part) + " [" + Blue + fmt.Sprint(dur) + Reset + "]: " + Yellow + fmt.Sprint(result) + Reset)
+}
+
 func read_file(file_path string) string {
 	content, err := os.ReadFile(file_path)
 	if err != nil {
@@ -17,7 +28,7 @@ func read_file(file_path string) string {
 	return string(content)
 }
 
-// / Create a table from the input.
+// Create a table from the input.
 func tabelize(text *string) [][]string {
 	lines := strings.Split(*text, "\n")
 	var table [][]string
@@ -29,7 +40,7 @@ func tabelize(text *string) [][]string {
 	return table
 }
 
-// / Transpose the text as a matrix.
+// Transpose the text as a matrix.
 func transpose(text *string) string {
 	var builder strings.Builder
 	table := tabelize(text)
@@ -42,7 +53,7 @@ func transpose(text *string) string {
 	return builder.String()
 }
 
-// / Create all diagonals of the text.
+// Create all diagonals of the text.
 func diag(text *string) string {
 	var builder strings.Builder
 	table := tabelize(text)
@@ -72,7 +83,7 @@ func swap(text *string) string {
 	return builder.String()
 }
 
-// / Replace all S by SS and X by XX.
+// Replace all S by SS and X by XX.
 func replace(text *string) string {
 	s := regexp.MustCompile("S")
 	x := regexp.MustCompile("X")
@@ -122,7 +133,7 @@ func part_one() {
 	text = replace(&text)
 	result = count_xmas(&text)
 	end := time.Now()
-	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
+	print_result(end.Sub(start), 1, result)
 }
 
 func part_two() {
@@ -132,11 +143,11 @@ func part_two() {
 	table := tabelize(&content)
 	result = count_x_mas(table)
 	end := time.Now()
-	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
+	print_result(end.Sub(start), 2, result)
 }
 
 func main() {
-	fmt.Println("Year 2024 day 4 - Ceres Search")
+	fmt.Println("Year " + Green + "2024" + Reset + " day " + Green + "4 - Ceres Search" + Reset)
 	part_one()
 	part_two()
 }

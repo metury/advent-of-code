@@ -9,6 +9,17 @@ import (
 	"time"
 )
 
+const (
+	Blue   = "\033[1;34m"
+	Yellow = "\033[1;33m"
+	Green  = "\033[1;32m"
+	Reset  = "\033[0m"
+)
+
+func print_result(dur time.Duration, part, result int) {
+	fmt.Println("Part " + fmt.Sprint(part) + " [" + Blue + fmt.Sprint(dur) + Reset + "]: " + Yellow + fmt.Sprint(result) + Reset)
+}
+
 func read_file(file_path string) []int {
 	content, err := os.ReadFile(file_path)
 	if err != nil {
@@ -82,7 +93,7 @@ func part_one() {
 	start := time.Now()
 	result = count_all(25)
 	end := time.Now()
-	fmt.Println("Part 1 [", end.Sub(start), "]:", result)
+	print_result(end.Sub(start), 1, result)
 }
 
 func part_two() {
@@ -90,11 +101,11 @@ func part_two() {
 	start := time.Now()
 	result = count_all(75)
 	end := time.Now()
-	fmt.Println("Part 2 [", end.Sub(start), "]:", result)
+	print_result(end.Sub(start), 2, result)
 }
 
 func main() {
-	fmt.Println("Year 2024 day 11 - Plutonian Pebbles")
+	fmt.Println("Year " + Green + "2024" + Reset + " day " + Green + "11 - Plutonian Pebbles" + Reset)
 	part_one()
 	part_two()
 }
