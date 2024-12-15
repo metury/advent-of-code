@@ -94,11 +94,8 @@ func wider_map(m [][]int8) [][]int8{
 
 func up_down_move(m *[][]int8, box [2]int, move [2]int) {
 	if (*m)[box[0]][box[1]] == LeftBox {
-		if (*m)[box[0] + move[0]][box[1]] == LeftBox {
+		if (*m)[box[0] + move[0]][box[1]] == LeftBox || (*m)[box[0] + move[0]][box[1]] == RightBox{
 			up_down_move(m, [2]int{box[0] + move[0], box[1]}, move)
-		}
-		if (*m)[box[0] + move[0]][box[1]] == RightBox {
-			up_down_move(m, [2]int{box[0] + move[0], box[1] - 1}, move)
 		}
 		if (*m)[box[0] + move[0]][box[1] + 1] == LeftBox {
 			up_down_move(m, [2]int{box[0] + move[0], box[1] + 1}, move)
@@ -112,20 +109,17 @@ func up_down_move(m *[][]int8, box [2]int, move [2]int) {
 	}
 }
 
-func up_down(m *[][]int8, box [2]int, move [2]int) bool {
-	if box[0] + move[0] < 0 || box[1] + move[1] < 0 || box[0] + move[0] >= len(*m) || box[1] >= len((*m)[box[0]]) {
+func up_down_check(m *[][]int8, box [2]int, move [2]int) bool {
+	if box[0] + move[0] < 0 || box[0] + move[0] >= len(*m) {
 		return false
 	}
 	plausible := true
 	if (*m)[box[0]][box[1]] == LeftBox {
-		if (*m)[box[0] + move[0]][box[1]] == LeftBox {
-			plausible = plausible && up_down(m, [2]int{box[0] + move[0], box[1]}, move)
-		}
-		if (*m)[box[0] + move[0]][box[1]] == RightBox {
-			plausible = plausible && up_down(m, [2]int{box[0] + move[0], box[1] - 1}, move)
+		if (*m)[box[0] + move[0]][box[1]] == LeftBox || (*m)[box[0] + move[0]][box[1]] == RightBox {
+			plausible = plausible && up_down_check(m, [2]int{box[0] + move[0], box[1]}, move)
 		}
 		if (*m)[box[0] + move[0]][box[1] + 1] == LeftBox {
-			plausible = plausible && up_down(m, [2]int{box[0] + move[0], box[1] + 1}, move)
+			plausible = plausible && up_down_check(m, [2]int{box[0] + move[0], box[1] + 1}, move)
 		}
 		if (*m)[box[0] + move[0]][box[1]] == Space && (*m)[box[0] + move[0]][box[1] + 1] == Space {
 			plausible = plausible && true
@@ -134,7 +128,7 @@ func up_down(m *[][]int8, box [2]int, move [2]int) bool {
 			plausible = false
 		}
 	} else if (*m)[box[0]][box[1]] == RightBox {
-		plausible = plausible && up_down(m, [2]int{box[0], box[1] - 1}, move)
+		plausible = plausible && up_down_check(m, [2]int{box[0], box[1] - 1}, move)
 	}
 	return plausible
 }
@@ -146,11 +140,7 @@ func move_larger_box(m *[][]int8, box [2]int, move [2]int) bool {
 		}
 		if box[1] + i * move[1] < len((*m)[box[0]]) && (*m)[box[0]][box[1] + i * move[1]] == Space {
 			(*m)[box[0]][box[1]] = Space
-			if (*m)[box[0]][box[1] + (i - 1) * move[1]] == LeftBox {
-				 (*m)[box[0]][box[1] + i* move[1]] = LeftBox
-			} else {
-				(*m)[box[0]][box[1] + i * move[1]] = RightBox
-			}
+			(*m)[box[0]][box[1] + i* move[1]] = (*m)[box[0]][box[1] + (i - 1) * move[1]]
 			for j := 1; j < i; j++ {
 				if (*m)[box[0]][box[1] + j * move[1]] == RightBox {
 					(*m)[box[0]][box[1] + j * move[1]] = LeftBox
@@ -158,11 +148,10 @@ func move_larger_box(m *[][]int8, box [2]int, move [2]int) bool {
 					(*m)[box[0]][box[1] + j * move[1]] = RightBox
 				}
 			}
-
 			return true
 		}
 	} else {
-		if up_down(m, box, move) {
+		if up_down_check(m, box, move) {
 			up_down_move(m, box, move)
 			return true
 		}
@@ -180,26 +169,6 @@ func move_box(m *[][]int8, box [2]int, move [2]int) bool {
 		return true
 	}
 	return false
-}
-
-func draw(m *[][]int8, position [2]int) {
-	for i, row := range *m {
-		for j, c := range row {
-			if c == Wall {
-				fmt.Print("#")
-			} else if [2]int{i,j} == position{
-				fmt.Print("@")
-			} else if c == Space {
-				fmt.Print(".")
-			} else if c == LeftBox {
-				fmt.Print("[")
-			} else if c == RightBox {
-				fmt.Print("]")
-			}
-		}
-		fmt.Println()
-	}
-	fmt.Println()
 }
 
 func single_step(m *[][]int8, position *[2]int, move [2]int) {
@@ -228,8 +197,6 @@ func single_step(m *[][]int8, position *[2]int, move [2]int) {
 func simulate(m *[][]int8, position *[2]int, moves [][2]int) int {
 	for _, move := range moves {
 		single_step(m, position, move)
-		//fmt.Println(move)
-		//draw(m, *position)
 	}
 	sum := 0
 	for i, row := range (*m) {
@@ -258,7 +225,6 @@ func part_two() {
 	wider := wider_map(m)
 	position[1] *= 2
 	result = simulate(&wider, &(position), moves)
-	//fmt.Println(wider)
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
 }
