@@ -89,18 +89,18 @@ func find_path(maze [][]int8, current, end, orientation [2]int, visited map[[2]i
 	return res
 }
 
-func extend_seats(maze [][]int8, position, end, orientation [2]int, visited map[[4]int]int, score, res, budget int, spots [][2]int) (int, [][2]int) {
+func extend_seats(maze [][]int8, position, end, orientation [2]int, visited map[[4]int]int, score, res, budget int, seats [][2]int) (int, [][2]int) {
 	length, ok := visited[[4]int{position[0], position[1], orientation[0], orientation[1]}]
 	if (!ok || length >= score) && maze[position[0]][position[1]] == Space {
-		new_res, new_spots := find_seats(maze, position, end, orientation, visited, score, budget)
+		new_res, new_seats := find_seats(maze, position, end, orientation, visited, score, budget)
 		if res > new_res {
 			res = new_res
-			spots = new_spots
+			seats = new_seats
 		} else if res == new_res {
-			spots = append(spots, new_spots[:]...)
+			seats = append(seats, new_seats[:]...)
 		}
 	}
-	return res, spots
+	return res, seats
 }
 
 func find_seats(maze [][]int8, current, end, orientation [2]int, visited map[[4]int]int, score, budget int) (int, [][2]int) {
