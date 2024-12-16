@@ -20,10 +20,10 @@ func print_result(dur time.Duration, part, result int) {
 }
 
 const (
-	Space = 0
-	Wall = 1
-	Box = 2
-	LeftBox = 3
+	Space    = 0
+	Wall     = 1
+	Box      = 2
+	LeftBox  = 3
 	RightBox = 4
 )
 
@@ -43,29 +43,29 @@ func read_file(file_path string) ([][]int8, [2]int, [][2]int) {
 			row := make([]int8, len(line))
 			for j, char := range strings.Split(line, "") {
 				switch char {
-					case "#":
-						row[j] = Wall
-					case "O":
-						row[j] = Box
-					case "@":
-						row[j] = Space
-						position = [2]int{i,j}
-					case ".":
-						row[j] = Space
+				case "#":
+					row[j] = Wall
+				case "O":
+					row[j] = Box
+				case "@":
+					row[j] = Space
+					position = [2]int{i, j}
+				case ".":
+					row[j] = Space
 				}
 			}
 			m = append(m, row)
 		} else {
 			for _, char := range strings.Split(line, "") {
 				switch char {
-					case ">":
-						moves = append(moves, [2]int{0,1})
-					case "<":
-						moves = append(moves, [2]int{0,-1})
-					case "^":
-						moves = append(moves, [2]int{-1,0})
-					case "v":
-						moves = append(moves, [2]int{1,0})
+				case ">":
+					moves = append(moves, [2]int{0, 1})
+				case "<":
+					moves = append(moves, [2]int{0, -1})
+				case "^":
+					moves = append(moves, [2]int{-1, 0})
+				case "v":
+					moves = append(moves, [2]int{1, 0})
 				}
 			}
 		}
@@ -73,18 +73,18 @@ func read_file(file_path string) ([][]int8, [2]int, [][2]int) {
 	return m, position, moves
 }
 
-func wider_map(m [][]int8) [][]int8{
+func wider_map(m [][]int8) [][]int8 {
 	wider := make([][]int8, len(m))
 	for i, row := range m {
 		var new_row []int8
 		for j := range row {
 			switch row[j] {
-				case Space:
-					new_row = append(new_row, Space, Space)
-				case Wall:
-					new_row = append(new_row, Wall, Wall)
-				case Box:
-					new_row = append(new_row, LeftBox, RightBox)
+			case Space:
+				new_row = append(new_row, Space, Space)
+			case Wall:
+				new_row = append(new_row, Wall, Wall)
+			case Box:
+				new_row = append(new_row, LeftBox, RightBox)
 			}
 		}
 		wider[i] = new_row
@@ -94,37 +94,37 @@ func wider_map(m [][]int8) [][]int8{
 
 func up_down_move(m *[][]int8, box [2]int, move [2]int) {
 	if (*m)[box[0]][box[1]] == LeftBox {
-		if (*m)[box[0] + move[0]][box[1]] == LeftBox || (*m)[box[0] + move[0]][box[1]] == RightBox{
+		if (*m)[box[0]+move[0]][box[1]] == LeftBox || (*m)[box[0]+move[0]][box[1]] == RightBox {
 			up_down_move(m, [2]int{box[0] + move[0], box[1]}, move)
 		}
-		if (*m)[box[0] + move[0]][box[1] + 1] == LeftBox {
+		if (*m)[box[0]+move[0]][box[1]+1] == LeftBox {
 			up_down_move(m, [2]int{box[0] + move[0], box[1] + 1}, move)
 		}
 		(*m)[box[0]][box[1]] = Space
-		(*m)[box[0]][box[1] + 1] = Space
-		(*m)[box[0] + move[0]][box[1]] = LeftBox
-		(*m)[box[0] + move[0]][box[1] + 1] = RightBox
+		(*m)[box[0]][box[1]+1] = Space
+		(*m)[box[0]+move[0]][box[1]] = LeftBox
+		(*m)[box[0]+move[0]][box[1]+1] = RightBox
 	} else if (*m)[box[0]][box[1]] == RightBox {
 		up_down_move(m, [2]int{box[0], box[1] - 1}, move)
 	}
 }
 
 func up_down_check(m *[][]int8, box [2]int, move [2]int) bool {
-	if box[0] + move[0] < 0 || box[0] + move[0] >= len(*m) {
+	if box[0]+move[0] < 0 || box[0]+move[0] >= len(*m) {
 		return false
 	}
 	plausible := true
 	if (*m)[box[0]][box[1]] == LeftBox {
-		if (*m)[box[0] + move[0]][box[1]] == LeftBox || (*m)[box[0] + move[0]][box[1]] == RightBox {
+		if (*m)[box[0]+move[0]][box[1]] == LeftBox || (*m)[box[0]+move[0]][box[1]] == RightBox {
 			plausible = plausible && up_down_check(m, [2]int{box[0] + move[0], box[1]}, move)
 		}
-		if (*m)[box[0] + move[0]][box[1] + 1] == LeftBox {
+		if (*m)[box[0]+move[0]][box[1]+1] == LeftBox {
 			plausible = plausible && up_down_check(m, [2]int{box[0] + move[0], box[1] + 1}, move)
 		}
-		if (*m)[box[0] + move[0]][box[1]] == Space && (*m)[box[0] + move[0]][box[1] + 1] == Space {
+		if (*m)[box[0]+move[0]][box[1]] == Space && (*m)[box[0]+move[0]][box[1]+1] == Space {
 			plausible = plausible && true
 		}
-		if (*m)[box[0] + move[0]][box[1]] == Wall || (*m)[box[0] + move[0]][box[1] + 1] == Wall {
+		if (*m)[box[0]+move[0]][box[1]] == Wall || (*m)[box[0]+move[0]][box[1]+1] == Wall {
 			plausible = false
 		}
 	} else if (*m)[box[0]][box[1]] == RightBox {
@@ -136,16 +136,16 @@ func up_down_check(m *[][]int8, box [2]int, move [2]int) bool {
 func move_larger_box(m *[][]int8, box [2]int, move [2]int) bool {
 	if move[0] == 0 {
 		i := 0
-		for ;box[1] + i * move[1] < len((*m)[box[0]]) && ((*m)[box[0]][box[1] + i * move[1]] == LeftBox || (*m)[box[0]][box[1] + i * move[1]] == RightBox); i += 1 {
+		for ; box[1]+i*move[1] < len((*m)[box[0]]) && ((*m)[box[0]][box[1]+i*move[1]] == LeftBox || (*m)[box[0]][box[1]+i*move[1]] == RightBox); i += 1 {
 		}
-		if box[1] + i * move[1] < len((*m)[box[0]]) && (*m)[box[0]][box[1] + i * move[1]] == Space {
+		if box[1]+i*move[1] < len((*m)[box[0]]) && (*m)[box[0]][box[1]+i*move[1]] == Space {
 			(*m)[box[0]][box[1]] = Space
-			(*m)[box[0]][box[1] + i* move[1]] = (*m)[box[0]][box[1] + (i - 1) * move[1]]
+			(*m)[box[0]][box[1]+i*move[1]] = (*m)[box[0]][box[1]+(i-1)*move[1]]
 			for j := 1; j < i; j++ {
-				if (*m)[box[0]][box[1] + j * move[1]] == RightBox {
-					(*m)[box[0]][box[1] + j * move[1]] = LeftBox
+				if (*m)[box[0]][box[1]+j*move[1]] == RightBox {
+					(*m)[box[0]][box[1]+j*move[1]] = LeftBox
 				} else {
-					(*m)[box[0]][box[1] + j * move[1]] = RightBox
+					(*m)[box[0]][box[1]+j*move[1]] = RightBox
 				}
 			}
 			return true
@@ -161,11 +161,11 @@ func move_larger_box(m *[][]int8, box [2]int, move [2]int) bool {
 
 func move_box(m *[][]int8, box [2]int, move [2]int) bool {
 	i := 0
-	for ; box[0] + i * move[0] < len(*m) && box[1] + i * move[1] < len((*m)[box[0]]) && (*m)[box[0] + i * move[0]][box[1] + i * move[1]] == Box; i++ {
+	for ; box[0]+i*move[0] < len(*m) && box[1]+i*move[1] < len((*m)[box[0]]) && (*m)[box[0]+i*move[0]][box[1]+i*move[1]] == Box; i++ {
 	}
-	if box[0] + i * move[0] < len(*m) && box[1] + i * move[1] < len((*m)[box[0]]) && (*m)[box[0] + i * move[0]][box[1] + i * move[1]] == Space {
+	if box[0]+i*move[0] < len(*m) && box[1]+i*move[1] < len((*m)[box[0]]) && (*m)[box[0]+i*move[0]][box[1]+i*move[1]] == Space {
 		(*m)[box[0]][box[1]] = Space
-		(*m)[box[0] + i * move[0]][box[1] + i * move[1]] = Box
+		(*m)[box[0]+i*move[0]][box[1]+i*move[1]] = Box
 		return true
 	}
 	return false
@@ -177,20 +177,20 @@ func single_step(m *[][]int8, position *[2]int, move [2]int) {
 		(*position)[1] + move[1],
 	}
 	switch (*m)[new_position[0]][new_position[1]] {
-		case Space:
+	case Space:
+		*position = new_position
+	case Wall:
+		return
+	case Box:
+		if move_box(m, new_position, move) {
 			*position = new_position
-		case Wall:
-			return
-		case Box:
-			if move_box(m, new_position, move) {
-				*position = new_position
-			}
-		case LeftBox:
-			fallthrough
-		case RightBox:
-			if move_larger_box(m, new_position, move) {
-				*position = new_position
-			}
+		}
+	case LeftBox:
+		fallthrough
+	case RightBox:
+		if move_larger_box(m, new_position, move) {
+			*position = new_position
+		}
 	}
 }
 
@@ -199,7 +199,7 @@ func simulate(m *[][]int8, position *[2]int, moves [][2]int) int {
 		single_step(m, position, move)
 	}
 	sum := 0
-	for i, row := range (*m) {
+	for i, row := range *m {
 		for j := range row {
 			if row[j] == Box || row[j] == LeftBox {
 				sum += i*100 + j

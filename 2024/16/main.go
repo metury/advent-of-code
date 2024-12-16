@@ -20,9 +20,9 @@ func print_result(dur time.Duration, part, result int) {
 }
 
 const (
-	Wall = 1
+	Wall  = 1
 	Space = 0
-	Max = int(^uint(0) >> 1)
+	Max   = int(^uint(0) >> 1)
 )
 
 func read_file(file_path string) ([][]int8, [2]int, [2]int) {
@@ -40,16 +40,16 @@ func read_file(file_path string) ([][]int8, [2]int, [2]int) {
 		row := make([]int8, len(line))
 		for j, c := range line {
 			switch c {
-				case '#':
-					row[j] = Wall
-				case '.':
-					row[j] = Space
-				case 'S':
-					start = [2]int{i, j}
-					row[j] = Space
-				case 'E':
-					end = [2]int{i, j}
-					row[j] = Space
+			case '#':
+				row[j] = Wall
+			case '.':
+				row[j] = Space
+			case 'S':
+				start = [2]int{i, j}
+				row[j] = Space
+			case 'E':
+				end = [2]int{i, j}
+				row[j] = Space
 			}
 		}
 		maze = append(maze, row)
@@ -76,15 +76,15 @@ func find_path(maze [][]int8, current, end, orientation [2]int, visited map[[2]i
 	visited[[2]int{current[0], current[1]}] = score
 
 	new_pos := [2]int{current[0] + orientation[0], current[1] + orientation[1]}
-	res = extend_path(maze, new_pos, end, orientation, visited, score + 1, res)
+	res = extend_path(maze, new_pos, end, orientation, visited, score+1, res)
 
 	new_orientation := [2]int{-orientation[1], orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	res = extend_path(maze, new_pos, end, new_orientation, visited, score + 1001, res)
+	res = extend_path(maze, new_pos, end, new_orientation, visited, score+1001, res)
 
 	new_orientation = [2]int{orientation[1], -orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	res = extend_path(maze, new_pos, end, new_orientation, visited, score + 1001, res)
+	res = extend_path(maze, new_pos, end, new_orientation, visited, score+1001, res)
 
 	return res
 }
@@ -115,15 +115,15 @@ func find_seats(maze [][]int8, current, end, orientation [2]int, visited map[[4]
 	visited[[4]int{current[0], current[1], orientation[0], orientation[1]}] = score
 
 	new_pos := [2]int{current[0] + orientation[0], current[1] + orientation[1]}
-	res, seats = extend_seats(maze, new_pos, end, orientation, visited, score + 1, res, budget, seats)
+	res, seats = extend_seats(maze, new_pos, end, orientation, visited, score+1, res, budget, seats)
 
 	new_orientation := [2]int{-orientation[1], orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	res, seats = extend_seats(maze, new_pos, end, new_orientation, visited, score + 1001, res, budget, seats)
+	res, seats = extend_seats(maze, new_pos, end, new_orientation, visited, score+1001, res, budget, seats)
 
 	new_orientation = [2]int{orientation[1], -orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	res, seats = extend_seats(maze, new_pos, end, new_orientation, visited, score + 1001, res, budget, seats)
+	res, seats = extend_seats(maze, new_pos, end, new_orientation, visited, score+1001, res, budget, seats)
 
 	return res, append(seats, current)
 }
@@ -132,7 +132,7 @@ func part_one() {
 	var result int
 	start := time.Now()
 	maze, start_point, end_point := read_file("INPUT")
-	result = find_path(maze, start_point, end_point, [2]int{0,1}, make(map[[2]int]int), 0)
+	result = find_path(maze, start_point, end_point, [2]int{0, 1}, make(map[[2]int]int), 0)
 	end := time.Now()
 	print_result(end.Sub(start), 1, result)
 }
@@ -141,8 +141,8 @@ func part_two() {
 	var result int
 	start := time.Now()
 	maze, start_point, end_point := read_file("INPUT")
-	length := find_path(maze, start_point, end_point, [2]int{0,1}, make(map[[2]int]int), 0)
-	_, spots := find_seats(maze, start_point, end_point, [2]int{0,1}, make(map[[4]int]int), 0, length)
+	length := find_path(maze, start_point, end_point, [2]int{0, 1}, make(map[[2]int]int), 0)
+	_, spots := find_seats(maze, start_point, end_point, [2]int{0, 1}, make(map[[4]int]int), 0, length)
 	seats := make(map[[2]int]bool)
 	for _, s := range spots {
 		seats[s] = true
