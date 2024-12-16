@@ -57,8 +57,8 @@ func read_file(file_path string) ([][]int8, [2]int, [2]int) {
 	return maze, start, end
 }
 
-func extend_path(maze [][]int8, position, end, orientation [2]int, visited map[[4]int]int, score, res int) int {
-	length, ok := visited[[4]int{position[0], position[1], orientation[0], orientation[1]}]
+func extend_path(maze [][]int8, position, end, orientation [2]int, visited map[[2]int]int, score, res int) int {
+	length, ok := visited[[2]int{position[0], position[1]}]
 	if (!ok || length > score) && maze[position[0]][position[1]] == Space {
 		new_res := find_path(maze, position, end, orientation, visited, score)
 		if res > new_res {
@@ -68,12 +68,12 @@ func extend_path(maze [][]int8, position, end, orientation [2]int, visited map[[
 	return res
 }
 
-func find_path(maze [][]int8, current, end, orientation [2]int, visited map[[4]int]int, score int) int {
+func find_path(maze [][]int8, current, end, orientation [2]int, visited map[[2]int]int, score int) int {
 	if current == end {
 		return score
 	}
 	res := Max
-	visited[[4]int{current[0], current[1], orientation[0], orientation[1]}] = score
+	visited[[2]int{current[0], current[1]}] = score
 
 	new_pos := [2]int{current[0] + orientation[0], current[1] + orientation[1]}
 	res = extend_path(maze, new_pos, end, orientation, visited, score + 1, res)
@@ -129,7 +129,7 @@ func part_one() {
 	var result int
 	start := time.Now()
 	maze, start_point, end_point := read_file("INPUT")
-	result = find_path(maze, start_point, end_point, [2]int{0,1}, make(map[[4]int]int), 0)
+	result = find_path(maze, start_point, end_point, [2]int{0,1}, make(map[[2]int]int), 0)
 	end := time.Now()
 	print_result(end.Sub(start), 1, result)
 }
