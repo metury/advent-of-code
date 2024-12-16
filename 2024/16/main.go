@@ -22,6 +22,7 @@ func print_result(dur time.Duration, part, result int) {
 const (
 	Wall = 1
 	Space = 0
+	Max = int(^uint(0) >> 1)
 )
 
 func read_file(file_path string) ([][]int8, [2]int, [2]int) {
@@ -56,79 +57,72 @@ func read_file(file_path string) ([][]int8, [2]int, [2]int) {
 	return maze, start, end
 }
 
+func extend_path(maze [][]int8, position, end, orientation [2]int, visited map[[4]int]int, score, res int) int {
+	length, ok := visited[[4]int{position[0], position[1], orientation[0], orientation[1]}]
+	if (!ok || length > score) && maze[position[0]][position[1]] == Space {
+		new_res := find_path(maze, position, end, orientation, visited, score)
+		if res > new_res {
+			return new_res
+		}
+	}
+	return res
+}
+
 func find_path(maze [][]int8, current, end, orientation [2]int, visited map[[4]int]int, score int) int {
 	if current == end {
 		return score
 	}
-	res := int(^uint(0) >> 1)
+	res := Max
 	visited[[4]int{current[0], current[1], orientation[0], orientation[1]}] = score
+
 	new_pos := [2]int{current[0] + orientation[0], current[1] + orientation[1]}
-	length, ok := visited[[4]int{new_pos[0], new_pos[1], orientation[0], orientation[1]}]
-	if (!ok || length > score + 1) && maze[new_pos[0]][new_pos[1]] == Space{
-		res = find_path(maze, new_pos, end, orientation, visited, score + 1)
-	}
+	res = extend_path(maze, new_pos, end, orientation, visited, score + 1, res)
+
 	new_orientation := [2]int{-orientation[1], orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	length, ok = visited[[4]int{new_pos[0], new_pos[1], new_orientation[0], new_orientation[1]}]
-	if (!ok || length > score + 1001) && maze[new_pos[0]][new_pos[1]] == Space {
-		new_res := find_path(maze, new_pos, end, new_orientation, visited, score + 1001)
-		if res > new_res {
-			res = new_res
-		}
+	res = extend_path(maze, new_pos, end, new_orientation, visited, score + 1001, res)
 
-	}
 	new_orientation = [2]int{orientation[1], -orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	length, ok = visited[[4]int{new_pos[0], new_pos[1], new_orientation[0], new_orientation[1]}]
-	if (!ok || length > score + 1001) && maze[new_pos[0]][new_pos[1]] == Space {
-		new_res := find_path(maze, new_pos, end, new_orientation, visited, score + 1001)
+	res = extend_path(maze, new_pos, end, new_orientation, visited, score + 1001, res)
+
+	return res
+}
+
+func extend_seats(maze [][]int8, position, end, orientation [2]int, visited map[[4]int]int, score, res int, spots [][2]int) (int, [][2]int) {
+	length, ok := visited[[4]int{position[0], position[1], orientation[0], orientation[1]}]
+	if (!ok || length >= score) && maze[position[0]][position[1]] == Space {
+		new_res, new_spots := find_seats(maze, position, end, orientation, visited, score)
 		if res > new_res {
 			res = new_res
+			spots = new_spots
+		} else if res == new_res {
+			spots = append(spots, new_spots[:]...)
 		}
-
 	}
-	return res
+	return res, spots
 }
 
 func find_seats(maze [][]int8, current, end, orientation [2]int, visited map[[4]int]int, score int) (int, [][2]int) {
 	if current == end {
 		return score, [][2]int{end}
 	}
-	res := int(^uint(0) >> 1)
-	var spots [][2]int
+	res := Max
+	var seats [][2]int
 	visited[[4]int{current[0], current[1], orientation[0], orientation[1]}] = score
+
 	new_pos := [2]int{current[0] + orientation[0], current[1] + orientation[1]}
-	length, ok := visited[[4]int{new_pos[0], new_pos[1], orientation[0], orientation[1]}]
-	if (!ok || length >= score + 1) && maze[new_pos[0]][new_pos[1]] == Space{
-		res, spots = find_seats(maze, new_pos, end, orientation, visited, score + 1)
-	}
+	res, seats = extend_seats(maze, new_pos, end, orientation, visited, score + 1, res, seats)
+
 	new_orientation := [2]int{-orientation[1], orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	length, ok = visited[[4]int{new_pos[0], new_pos[1], new_orientation[0], new_orientation[1]}]
-	if (!ok || length >= score + 1001) && maze[new_pos[0]][new_pos[1]] == Space {
-		new_res, new_spots := find_seats(maze, new_pos, end, new_orientation, visited, score + 1001)
-		if res > new_res {
-			res = new_res
-			spots = new_spots
-		} else if res == new_res {
-			spots = append(spots, new_spots[:]...)
-		}
+	res, seats = extend_seats(maze, new_pos, end, new_orientation, visited, score + 1001, res, seats)
 
-	}
 	new_orientation = [2]int{orientation[1], -orientation[0]}
 	new_pos = [2]int{current[0] + new_orientation[0], current[1] + new_orientation[1]}
-	length, ok = visited[[4]int{new_pos[0], new_pos[1], new_orientation[0], new_orientation[1]}]
-	if (!ok || length >= score + 1001) && maze[new_pos[0]][new_pos[1]] == Space {
-		new_res, new_spots := find_seats(maze, new_pos, end, new_orientation, visited, score + 1001)
-		if res > new_res {
-			res = new_res
-			spots = new_spots
-		} else if res == new_res {
-			spots = append(spots, new_spots[:]...)
-		}
+	res, seats = extend_seats(maze, new_pos, end, new_orientation, visited, score + 1001, res, seats)
 
-	}
-	return res, append(spots, current)
+	return res, append(seats, current)
 }
 
 func part_one() {
