@@ -63,7 +63,7 @@ func combo(computer *Computer, val int) int {
 	if val == 6 {
 		return (*computer).c
 	}
-	panic("WHOA")
+	panic("no such possible operand")
 }
 
 func do_operation(computer *Computer, pointer int) (int, bool) {
@@ -111,6 +111,9 @@ func find_divisor(computer Computer) int {
 	divisor := 1
 	for i := 0; i < len(computer.program); i += 2 {
 		if computer.program[i] == 0 {
+			if computer.program[i+1] > 3 {
+				panic("no good solution")
+			}
 			divisor *= int(math.Pow(2, float64(combo(&computer, computer.program[i+1]))))
 		}
 	}
@@ -120,7 +123,7 @@ func find_divisor(computer Computer) int {
 func solve(computer Computer, prev, index, divisor int) (int, bool) {
 	j := index
 	for i := 0; i < divisor; i++ {
-		computer.a = prev*8 + i
+		computer.a = prev*divisor + i
 		computer.output = make([]int, 0)
 		simulate(&computer)
 		if j >= len(computer.output) {
@@ -128,9 +131,9 @@ func solve(computer Computer, prev, index, divisor int) (int, bool) {
 		}
 		if computer.output[len(computer.output)-j-1] == computer.program[len(computer.program)-j-1] {
 			if j == len(computer.program)-1 {
-				return prev*8 + i, true
+				return prev*divisor + i, true
 			}
-			sol, ok := solve(computer, prev*8+i, index+1, divisor)
+			sol, ok := solve(computer, prev*divisor+i, index+1, divisor)
 			if ok {
 				return sol, ok
 			}
