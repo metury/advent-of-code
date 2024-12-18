@@ -43,8 +43,8 @@ func read_file(file_path string) [][2]int {
 	return numbers
 }
 
-func find_path(m [Size][Size]bool, current, previous, end [2]int, visited map[[2]int][3]int, length int) {
-	if current[0] < 0 || current[1] < 0 || current[0] >= Size || current[1] >= Size || m[current[0]][current[1]] {
+func find_path(m *[Size][Size]bool, current, previous, end [2]int, visited map[[2]int][3]int, length int) {
+	if current[0] < 0 || current[1] < 0 || current[0] >= Size || current[1] >= Size || (*m)[current[0]][current[1]] {
 		return
 	}
 	prev, ok := visited[current]
@@ -81,7 +81,7 @@ func part_one() {
 		m[bytes[i][1]][bytes[i][0]] = true
 	}
 	visited := make(map[[2]int][3]int)
-	find_path(m, Start, Start, End, visited, 0)
+	find_path(&m, Start, Start, End, visited, 0)
 	res, _ := visited[End]
 	result = res[0]
 	end := time.Now()
@@ -99,7 +99,7 @@ func part_two() {
 	t := Rep - 1
 	for {
 		visited := make(map[[2]int][3]int)
-		find_path(m, [2]int{0, 0}, [2]int{0, 0}, [2]int{Size - 1, Size - 1}, visited, 0)
+		find_path(&m, [2]int{0, 0}, [2]int{0, 0}, [2]int{Size - 1, Size - 1}, visited, 0)
 		_, ok := visited[[2]int{Size - 1, Size - 1}]
 		if !ok {
 			result = bytes[t]
