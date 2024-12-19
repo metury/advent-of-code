@@ -26,87 +26,58 @@ func read_file(file_path string) ([]string, []string) {
 	}
 	lines := strings.Split(string(content), "\n")
 	patterns := strings.Split(lines[0], ", ")
-	var rest []string
-	for _, line := range lines[1:]{
+	var towels []string
+	for _, line := range lines[1:] {
 		if len(line) == 0 {
 			continue
 		}
-		rest = append(rest, line)
+		towels = append(towels, line)
 	}
-	return patterns, rest
+	return patterns, towels
 }
 
-func is_plaussible(patterns []string, towel string) bool {
+func is_plausible(patterns []string, towel string) bool {
 	if len(towel) == 0 {
 		return true
 	}
-	plaussible := false
+	plausible := false
 	for _, pattern := range patterns {
-		if len(towel) < len(pattern) {
+		length := len(pattern)
+		if len(towel) < length {
 			continue
 		}
-		if towel[:len(pattern)] == pattern {
-			plaussible = plaussible || is_plaussible(patterns, towel[len(pattern):])
+		if towel[:length] == pattern {
+			plausible = plausible || is_plausible(patterns, towel[length:])
 		}
-		if plaussible {
-			return plaussible
-		}
-	}
-	return plaussible
-}
-
-func print_out(towel string, m map[[2]int]int) {
-	for key, val := range m {
-		fmt.Println(towel[key[0]:key[1]], val)
-	}
-}
-
-func tabelize(patterns map[string]bool, towel string) int {
-	results := make(map[[2]int]int)
-	for i := 1; i <= len(towel); i++ {
-		for j := 0; j < len(towel); j++ {
-			e := j + i
-			if e > len(towel) {
-				continue
-			}
-			results[[2]int{j, e}] = 0
-			_, ok := patterns[towel[j : e]]
-			if ok {
-				results[[2]int{j, e}] += 1
-			}
-			for k := j + 1; k < e; k++ {
- 				res := results[[2]int{j, k}] * results[[2]int{k,e}]
-				results[[2]int{j, e}] += res
-			}
+		if plausible {
+			return plausible
 		}
 	}
-	print_out(towel, results)
-	fmt.Println()
-	return results[[2]int{0, len(towel)}]
+	return plausible
 }
 
-func nr_is_plaussible(patterns []string, towel string, cache *map[string]int) int {
+func nr_of_plausible(patterns []string, towel string, cache *map[string]int) int {
 	if len(towel) == 0 {
 		return 1
 	}
-	plaussible := 0
+	counter := 0
 	for _, pattern := range patterns {
-		if len(towel) < len(pattern) {
+		length := len(pattern)
+		if len(towel) < length {
 			continue
 		}
-		if towel[:len(pattern)] == pattern {
-			res, ok := (*cache)[towel[len(pattern):]]
+		if towel[:length] == pattern {
+			precomputed, ok := (*cache)[towel[length:]]
 			if ok {
-				plaussible += res
+				counter += precomputed
 			} else {
-				r := nr_is_plaussible(patterns, towel[len(pattern):], cache)
-				(*cache)[towel[len(pattern):]] = r
-				plaussible += r
+				computed := nr_of_plausible(patterns, towel[length:], cache)
+				(*cache)[towel[length:]] = computed
+				counter += computed
 			}
-
 		}
 	}
-	return plaussible
+	return counter
 }
 
 func part_one() {
@@ -114,7 +85,7 @@ func part_one() {
 	start := time.Now()
 	patterns, rest := read_file("INPUT")
 	for _, tow := range rest {
-		if is_plaussible(patterns, tow) {
+		if is_plausible(patterns, tow) {
 			result += 1
 		}
 	}
@@ -128,7 +99,7 @@ func part_two() {
 	patterns, towels := read_file("INPUT")
 	cache := make(map[string]int)
 	for _, towel := range towels {
-		result += nr_is_plaussible(patterns, towel, &cache)
+		result += nr_of_plausible(patterns, towel, &cache)
 	}
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
