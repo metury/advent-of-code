@@ -55,36 +55,37 @@ func is_plaussible(patterns []string, towel string) bool {
 	return plaussible
 }
 
-func create_table(patterns []string) map[string]int{
-	dyn := make(map[string]int)
-	for _, pat := range patterns {
-		dyn[pat] = 1
+func print_out(towel string, m map[[2]int]int) {
+	for key, val := range m {
+		fmt.Println(towel[key[0]:key[1]], val)
 	}
-	max := 2
-	forb := make(map[string]bool)
-	for  {
-		for key, val := range dyn {
-			for key2, val2 := range dyn {
-				_, ok := dyn[key + key2]
-				_, f := forb[key+key2]
-				if ok && !f{
-					dyn[key+key2] += val*val2
-				}
-				_, ok = dyn[key2 + key]
-				_, f = forb[key2+key]
-				if ok && !f && key != key2{
-					dyn[key2+key] += val*val2
-				}
-				forb[key+key2] = true
-				forb[key2+key] = true
-			}
-		}
-		max++
-	}
-	return dyn
 }
 
-func nr_is_plaussible(patterns []string, towel string) int {
+func tabelize(patterns map[string]bool, towel string) int {
+	results := make(map[[2]int]int)
+	for i := 1; i <= len(towel); i++ {
+		for j := 0; j < len(towel); j++ {
+			e := j + i
+			if e > len(towel) {
+				continue
+			}
+			results[[2]int{j, e}] = 0
+			_, ok := patterns[towel[j : e]]
+			if ok {
+				results[[2]int{j, e}] += 1
+			}
+			for k := j + 1; k < e; k++ {
+ 				res := results[[2]int{j, k}] * results[[2]int{k,e}]
+				results[[2]int{j, e}] += res
+			}
+		}
+	}
+	print_out(towel, results)
+	fmt.Println()
+	return results[[2]int{0, len(towel)}]
+}
+
+func nr_is_plaussible(patterns []string, towel string, cache *map[string]int) int {
 	if len(towel) == 0 {
 		return 1
 	}
@@ -94,7 +95,15 @@ func nr_is_plaussible(patterns []string, towel string) int {
 			continue
 		}
 		if towel[:len(pattern)] == pattern {
-			plaussible += nr_is_plaussible(patterns, towel[len(pattern):])
+			res, ok := (*cache)[towel[len(pattern):]]
+			if ok {
+				plaussible += res
+			} else {
+				r := nr_is_plaussible(patterns, towel[len(pattern):], cache)
+				(*cache)[towel[len(pattern):]] = r
+				plaussible += r
+			}
+
 		}
 	}
 	return plaussible
@@ -116,9 +125,11 @@ func part_one() {
 func part_two() {
 	var result int
 	start := time.Now()
-	patterns, _ := read_file("INPUT")
-	dyn := create_table(patterns)
-	fmt.Println(dyn)
+	patterns, towels := read_file("INPUT")
+	cache := make(map[string]int)
+	for _, towel := range towels {
+		result += nr_is_plaussible(patterns, towel, &cache)
+	}
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
 }
