@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -94,7 +95,7 @@ func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, pos
 
 func count_shortcuts(picoseconds, limit int) int {
 	result := 0
-	m, start_pos, _ := read_file("INPUT")
+	m, start_pos, end_pos := read_file("INPUT")
 	visited := make([][]int, len(m))
 	for i, row := range m {
 		visited[i] = make([]int, len(m[i]))
@@ -103,14 +104,25 @@ func count_shortcuts(picoseconds, limit int) int {
 		}
 	}
 	find_shortest_path(&m, start_pos, 0, &visited)
+	var wg sync.WaitGroup
+	c := make(chan int, visited[end_pos[0]][end_pos[1]] + 1)
+	wg.Add(visited[end_pos[0]][end_pos[1]] + 1)
 	for i, row := range m {
 		for j := range row {
 			if m[i][j] {
 				ends := make(map[[2]int]bool)
-				find_shortcuts(&m, &visited, picoseconds, limit, visited[i][j], [2]int{i,j}, make(map[[2]int]int), ends, true)
-				result += len(ends)
+				go func(i, j int) {
+					defer wg.Done()
+					find_shortcuts(&m, &visited, picoseconds, limit, visited[i][j], [2]int{i,j}, make(map[[2]int]int), ends, true)
+					c <- len(ends)
+				}(i, j)
 			}
 		}
+	}
+	wg.Wait()
+	close(c)
+	for res := range c {
+		result += res
 	}
 	return result
 }
