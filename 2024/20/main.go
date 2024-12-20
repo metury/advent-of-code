@@ -70,7 +70,7 @@ func find_shortest_path(m *[][]bool, position [2]int, length int, visited *[][]i
 	}
 }
 
-func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, position [2]int, previous map[[2]int]int, ends map[[2]int]bool) {
+func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, position [2]int, previous map[[2]int]int, ends map[[2]int]bool, cheat bool) {
 	if timer <= 0 {
 		return
 	}
@@ -82,17 +82,13 @@ func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, pos
 		}
 		if (*m)[neigh[0]][neigh[1]] && (*visited)[neigh[0]][neigh[1]] - limit >= length {
 			ends[neigh] = true
-			continue
-		}
-		if (*m)[neigh[0]][neigh[1]] {
-			continue
 		}
 		prev, ok := previous[neigh]
 		if ok && prev <= length {
 			continue
 		}
 		previous[neigh] = length
-		find_shortcuts(m, visited, timer, limit, length, neigh, previous, ends)
+		find_shortcuts(m, visited, timer, limit, length, neigh, previous, ends, cheat && (*m)[neigh[0]][neigh[1]])
 	}
 }
 
@@ -111,7 +107,7 @@ func count_shortcuts(picoseconds, limit int) int {
 		for j := range row {
 			if m[i][j] {
 				ends := make(map[[2]int]bool)
-				find_shortcuts(&m, &visited, picoseconds, limit, visited[i][j], [2]int{i,j}, make(map[[2]int]int), ends)
+				find_shortcuts(&m, &visited, picoseconds, limit, visited[i][j], [2]int{i,j}, make(map[[2]int]int), ends, true)
 				result += len(ends)
 			}
 		}
@@ -122,7 +118,7 @@ func count_shortcuts(picoseconds, limit int) int {
 func part_one() {
 	var result int
 	start := time.Now()
-	result = count_shortcuts(2, 1)
+	result = count_shortcuts(2, 100)
 	end := time.Now()
 	print_result(end.Sub(start), 1, result)
 }
@@ -130,7 +126,7 @@ func part_one() {
 func part_two() {
 	var result int
 	start := time.Now()
-	result = count_shortcuts(20, 50)
+	result = count_shortcuts(20, 100)
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
 }
