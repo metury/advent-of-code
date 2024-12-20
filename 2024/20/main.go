@@ -71,11 +71,11 @@ func find_shortest_path(m *[][]bool, position [2]int, length int, visited *[][]i
 }
 
 func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, position [2]int, previous map[[2]int]int, ends map[[2]int]bool) {
-	timer--
-	length++
-	if timer < 0 {
+	if timer <= 0 {
 		return
 	}
+	timer--
+	length++
 	for _, neigh := range get_neighbours(position[0], position[1]) {
 		if neigh[0] < 0 || neigh[1] < 0 || neigh[0] >= len(*m) || neigh[1] >= len((*m)[neigh[0]]) {
 			continue
@@ -87,8 +87,8 @@ func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, pos
 		if (*m)[neigh[0]][neigh[1]] {
 			continue
 		}
-		l, ok := previous[neigh]
-		if ok && l <= length {
+		prev, ok := previous[neigh]
+		if ok && prev <= length {
 			continue
 		}
 		previous[neigh] = length
