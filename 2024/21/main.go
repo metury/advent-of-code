@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -33,23 +32,22 @@ var Numpad [][]rune = [][]rune{
 	{'Q', 'Q', 'Q', 'Q', 'Q'},
 }
 
-var Directionalpad = [][]rune {
+var Directionalpad = [][]rune{
 	{'Q', 'Q', 'Q', 'Q', 'Q'},
 	{'Q', 'Q', '^', 'A', 'Q'},
 	{'Q', '<', 'v', '>', 'Q'},
 	{'Q', 'Q', 'Q', 'Q', 'Q'},
 }
 
-var order = map[rune]int {
-	'v': 1,
-	'<': 2,
+var order = map[rune]int{
+	'v': 2,
+	'<': 1,
 	'>': 3,
 	'^': 4,
 	'A': 5,
 }
 
-
-func customLess(a, b rune) bool {
+func order_runes(a, b rune) bool {
 	return order[a] < order[b]
 }
 
@@ -68,30 +66,24 @@ func read_file(file_path string) []string {
 	return codes
 }
 
+func add_one_neighbour(start, current [2]int, instr string, table map[[2]rune]string, pad [][]rune, sign rune) {
+	if pad[current[0]][current[1]] != Invalid {
+		append_neighbours(start, current, instr+string(sign), table, pad)
+	}
+}
+
 func append_neighbours(start, current [2]int, instr string, table map[[2]rune]string, pad [][]rune) {
 	c_start := pad[start[0]][start[1]]
 	c_current := pad[current[0]][current[1]]
 	prev, ok := table[[2]rune{c_start, c_current}]
-	if ok && len(prev) <= len(instr){
+	if ok && len(prev) <= len(instr) {
 		return
 	}
 	table[[2]rune{c_start, c_current}] = instr + "A"
-	new_current := [2]int{current[0] + 1, current[1]}
-	if pad[new_current[0]][new_current[1]] != Invalid  {
-		append_neighbours(start, new_current, instr + "v", table, pad)
-	}
-	new_current = [2]int{current[0] - 1, current[1]}
-	if pad[new_current[0]][new_current[1]] != Invalid  {
-		append_neighbours(start, new_current, instr + "^", table, pad)
-	}
-	new_current = [2]int{current[0], current[1] + 1}
-	if pad[new_current[0]][new_current[1]] != Invalid  {
-		append_neighbours(start, new_current, instr + ">", table, pad)
-	}
-	new_current = [2]int{current[0], current[1] - 1}
-	if pad[new_current[0]][new_current[1]] != Invalid  {
-		append_neighbours(start, new_current, instr + "<", table, pad)
-	}
+	add_one_neighbour(start, [2]int{current[0] + 1, current[1]}, instr, table, pad, 'v')
+	add_one_neighbour(start, [2]int{current[0] - 1, current[1]}, instr, table, pad, '^')
+	add_one_neighbour(start, [2]int{current[0], current[1] - 1}, instr, table, pad, '<')
+	add_one_neighbour(start, [2]int{current[0], current[1] + 1}, instr, table, pad, '>')
 }
 
 func tabelize(pad [][]rune) map[[2]rune]string {
@@ -99,14 +91,14 @@ func tabelize(pad [][]rune) map[[2]rune]string {
 	for i, row := range pad {
 		for j := range row {
 			if pad[i][j] != Invalid {
-				append_neighbours([2]int{i,j}, [2]int{i,j}, "", table, pad)
+				append_neighbours([2]int{i, j}, [2]int{i, j}, "", table, pad)
 			}
 		}
 	}
 	for key, val := range table {
 		runes := []rune(val)
 		sort.Slice(runes, func(i, j int) bool {
-			return customLess(runes[i], runes[j])
+			return order_runes(runes[i], runes[j])
 		})
 		table[key] = string(runes)
 	}
@@ -116,17 +108,19 @@ func tabelize(pad [][]rune) map[[2]rune]string {
 func find(table map[[2]rune]string, instr string) string {
 	instr = "A" + instr
 	movement := ""
-	for i := 1; i < len(instr); i++{
+	for i := 1; i < len(instr); i++ {
 		movement += table[[2]rune{rune(instr[i-1]), rune(instr[i])}]
 	}
 	runes := []rune(movement)
 	if runes[0] == '<' && runes[1] == '<' {
 		i := 0
-		for ;runes[i] == '<'; i++ {}
+		for ; runes[i] == '<'; i++ {
+		}
 		j := i + 1
-		for ;runes[j] == runes[i]; j++ {}
+		for ; runes[j] == runes[i]; j++ {
+		}
 		for k := 0; k < i && i+k < j; k++ {
-			runes[k], runes[j-1-k] =  runes[j-k-1], runes[k]
+			runes[k], runes[j-1-k] = runes[j-k-1], runes[k]
 		}
 	}
 	movement = string(runes)
@@ -138,34 +132,34 @@ func repair(intr string, pad [][]rune, i, j int) string {
 	for k := 0; k < len(res); k++ {
 		chr := res[k]
 		switch chr {
-			case '<':
-				if pad[i][j-1] == Invalid {
-					res[k+1], res[k] = res[k], res[k+1]
-					k--
-				} else {
-					j--
-				}
-			case '>':
-				if pad[i][j+1] == Invalid {
-					res[k+1], res[k] = res[k], res[k+1]
-					k--
-				} else {
-					j++
-				}
-			case '^':
-				if pad[i-1][j] == Invalid {
-					res[k+1], res[k] = res[k], res[k+1]
-					k--
-				} else {
-					i--
-				}
-			case 'v':
-				if pad[i+1][j] == Invalid {
-					res[k+1], res[k] = res[k], res[k+1]
-					k--
-				} else {
-					i++
-				}
+		case '<':
+			if pad[i][j-1] == Invalid {
+				res[k+1], res[k] = res[k], res[k+1]
+				k--
+			} else {
+				j--
+			}
+		case '>':
+			if pad[i][j+1] == Invalid {
+				res[k+1], res[k] = res[k], res[k+1]
+				k--
+			} else {
+				j++
+			}
+		case '^':
+			if pad[i-1][j] == Invalid {
+				res[k+1], res[k] = res[k], res[k+1]
+				k--
+			} else {
+				i--
+			}
+		case 'v':
+			if pad[i+1][j] == Invalid {
+				res[k+1], res[k] = res[k], res[k+1]
+				k--
+			} else {
+				i++
+			}
 		}
 	}
 	return string(res)
@@ -173,7 +167,7 @@ func repair(intr string, pad [][]rune, i, j int) string {
 
 func squish(instr string) string {
 	runes := []rune(instr)
-	for i := 1; i < len(runes) - 1; i++ {
+	for i := 1; i < len(runes)-1; i++ {
 		if runes[i] == 'A' || runes[i-1] == 'A' {
 			continue
 		}
@@ -189,8 +183,22 @@ func squish(instr string) string {
 	return string(runes)
 }
 
-func seq(top, n, value int, code string, table map[[2]rune]string, table_d map[[2]rune]string) int {
-	fmt.Println(n)
+func compress(instr string) (string, int) {
+	var runes []rune
+	sum := 0
+	runes = append(runes, rune(instr[0]))
+	for i := 1; i < len(instr); i++ {
+		if instr[i-1] == instr[i] {
+			sum += 1
+		} else {
+			runes = append(runes, rune(instr[i]))
+		}
+	}
+	return string(runes), sum
+}
+
+func seqeunce(top, n, value int, code string, table map[[2]rune]string, table_d map[[2]rune]string, cache *map[string]string) int {
+	fmt.Println("N:", n, "SIZE:", len(code))
 	if n == 0 {
 		return value * len(code)
 	}
@@ -198,15 +206,23 @@ func seq(top, n, value int, code string, table map[[2]rune]string, table_d map[[
 		m := find(table, code)
 		m = repair(m, Numpad, 4, 3)
 		m = squish(m)
-		return seq(top, n-1, value, m, table, table_d)
+		m, sum := compress(m)
+		return seqeunce(top, n-1, value, m, table, table_d, cache) + value*sum
 	} else {
-		m := find(table_d, code)
-		m = repair(m, Directionalpad, 1, 3)
-		m = squish(m)
-		return seq(top, n-1, value, m, table, table_d)
+		m := ""
+		val, ok := (*cache)[code]
+		if ok {
+			m = val
+		} else {
+			m = find(table_d, code)
+			m = repair(m, Directionalpad, 1, 3)
+			m = squish(m)
+			(*cache)[code] = m
+		}
+		m, sum := compress(m)
+		return seqeunce(top, n-1, value, m, table, table_d, cache) + value*sum
 	}
 }
-
 
 func part_one() {
 	var result int
@@ -214,20 +230,10 @@ func part_one() {
 	codes := read_file("INPUT")
 	table := tabelize(Numpad)
 	table_d := tabelize(Directionalpad)
-	var wg  sync.WaitGroup
-	wg.Add(len(codes))
-	c := make(chan int, len(codes))
+	cache := make(map[string]string)
 	for _, code := range codes {
-		go func(code string) {
-			defer wg.Done()
-			nr, _ :=strconv.Atoi(code[:len(code) - 1])
-			c <- seq(3, 3, nr, code, table, table_d)
-		}(code)
-	}
-	wg.Wait()
-	close(c)
-	for res := range c {
-		result += res
+		nr, _ := strconv.Atoi(code[:len(code)-1])
+		result += seqeunce(3, 3, nr, code, table, table_d, &cache)
 	}
 	end := time.Now()
 	print_result(end.Sub(start), 1, result)
@@ -239,20 +245,10 @@ func part_two() {
 	codes := read_file("INPUT")
 	table := tabelize(Numpad)
 	table_d := tabelize(Directionalpad)
-	var wg  sync.WaitGroup
-	wg.Add(len(codes))
-	c := make(chan int, len(codes))
+	cache := make(map[string]string)
 	for _, code := range codes {
-		go func(code string) {
-			defer wg.Done()
-			nr, _ :=strconv.Atoi(code[:len(code) - 1])
-			c <- seq(26, 26, nr, code, table, table_d)
-		}(code)
-	}
-	wg.Wait()
-	close(c)
-	for res := range c {
-		result += res
+		nr, _ := strconv.Atoi(code[:len(code)-1])
+		result += seqeunce(26, 26, nr, code, table, table_d, &cache)
 	}
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
