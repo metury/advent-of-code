@@ -197,31 +197,49 @@ func compress(instr string) (string, int) {
 	return string(runes), sum
 }
 
-func seqeunce(top, n, value int, code string, table map[[2]rune]string, table_d map[[2]rune]string, cache *map[string]string) int {
-	if n == 0 {
-		return value * len(code)
-	}
-	if top == n {
-		m := find(table, code)
-		m = repair(m, Numpad, 4, 3)
-		m = squish(m)
-		m, sum := compress(m)
-		return seqeunce(top, n-1, value, m, table, table_d, cache) + value*sum
-	} else {
-		m := ""
-		val, ok := (*cache)[code]
+func bootstrap(code string, repetitions int, table map[[2]rune]string, table_d map[[2]rune]string) int {
+	m := find(table, code)
+	m = repair(m, Numpad, 4, 3)
+	m = squish(m)
+	counters := make(map[string]int)
+	splited := strings.Split(m, "A")
+	for _, str := range  splited[:len(splited)-1] {
+		prev, ok := counters["A"+str+"A"]
 		if ok {
-			fmt.Println("USED")
-			m = val
+			counters["A"+str+"A"] = prev + 1
 		} else {
-			m = find(table_d, code)
-			m = repair(m, Directionalpad, 1, 3)
-			m = squish(m)
-			(*cache)[code] = m
+			counters["A"+str+"A"] = 1
 		}
-		m, sum := compress(m)
-		return seqeunce(top, n-1, value, m, table, table_d, cache) + value*sum
 	}
+	for i := 0; i < repetitions; i++ {
+		counters = simplified(counters, table_d)
+	}
+	sum := 0
+	for key, val := range counters {
+		sum += val * (len(key)-1)
+	}
+	return sum
+}
+
+
+func simplified(counters map[string]int, table map[[2]rune]string) map[string]int {
+	new_map := make(map[string]int)
+	for key, val := range counters {
+		m := find(table, key)
+		m = repair(m, Directionalpad, 1, 3)
+		m = squish(m)
+		splited := strings.Split(m, "A")
+		fmt.Println(m, splited)
+		for _, str := range splited[1:len(splited)-1] {
+			prev, ok := new_map["A"+str+"A"]
+			if ok {
+				new_map["A"+str+"A"] = val + prev
+			} else {
+				new_map["A"+str+"A"] = val
+			}
+		}
+	}
+	return new_map
 }
 
 func part_one() {
@@ -230,10 +248,10 @@ func part_one() {
 	codes := read_file("INPUT")
 	table := tabelize(Numpad)
 	table_d := tabelize(Directionalpad)
-	cache := make(map[string]string)
 	for _, code := range codes {
 		nr, _ := strconv.Atoi(code[:len(code)-1])
-		result += seqeunce(3, 3, nr, code, table, table_d, &cache)
+		sum := bootstrap(code, 2, table, table_d)
+		result += nr * sum
 	}
 	end := time.Now()
 	print_result(end.Sub(start), 1, result)
@@ -245,10 +263,10 @@ func part_two() {
 	codes := read_file("INPUT")
 	table := tabelize(Numpad)
 	table_d := tabelize(Directionalpad)
-	cache := make(map[string]string)
 	for _, code := range codes {
 		nr, _ := strconv.Atoi(code[:len(code)-1])
-		result += seqeunce(26, 26, nr, code, table, table_d, &cache)
+		sum := bootstrap(code, 25, table, table_d)
+		result += nr * sum
 	}
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
