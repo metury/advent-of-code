@@ -32,12 +32,16 @@ var Numpad [][]rune = [][]rune{
 	{'#', '#', '#', '#', '#'},
 }
 
+var Numstart [2]int = [2]int{4, 3}
+
 var Dirpad = [][]rune{
 	{'#', '#', '#', '#', '#'},
 	{'#', '#', '^', 'A', '#'},
 	{'#', '<', 'v', '>', '#'},
 	{'#', '#', '#', '#', '#'},
 }
+
+var Dirstart [2]int = [2]int{1, 3}
 
 var order = map[rune]int{
 	'<': 1,
@@ -184,12 +188,10 @@ func squish(instr string) string {
 }
 
 func bootstrap(code string, repetitions int, table map[[2]rune]string, table_d map[[2]rune]string) int {
-	m := find(table, code)
-	m = repair(m, Numpad, 4, 3)
-	m = squish(m)
+	m := squish(repair(find(table, code), Numpad, Numstart[0], Numstart[1]))
 	counters := make(map[string]int)
 	splited := strings.Split(m, "A")
-	for _, str := range  splited[:len(splited)-1] {
+	for _, str := range splited[:len(splited)-1] {
 		prev, ok := counters["A"+str+"A"]
 		if ok {
 			counters["A"+str+"A"] = prev + 1
@@ -202,20 +204,17 @@ func bootstrap(code string, repetitions int, table map[[2]rune]string, table_d m
 	}
 	sum := 0
 	for key, val := range counters {
-		sum += val * (len(key)-1)
+		sum += val * (len(key) - 1)
 	}
 	return sum
 }
 
-
 func simplified(counters map[string]int, table map[[2]rune]string) map[string]int {
 	new_map := make(map[string]int)
 	for key, val := range counters {
-		m := find(table, key)
-		m = repair(m, Dirpad, 1, 3)
-		m = squish(m)
+		m := squish(repair(find(table, key), Dirpad, Dirstart[0], Dirstart[1]))
 		splited := strings.Split(m, "A")
-		for _, str := range splited[1:len(splited)-1] {
+		for _, str := range splited[1 : len(splited)-1] {
 			prev, ok := new_map["A"+str+"A"]
 			if ok {
 				new_map["A"+str+"A"] = val + prev
