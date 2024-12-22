@@ -58,10 +58,10 @@ func best_sell(secret int, big_table *map[[4]int]int) {
 		changes[i % 4] = (secret % 10) - last
 		last = secret % 10
 		if changes[3] != -10 {
-			index := [4]int{changes[mod(i - 3)], changes[mod(i - 2)], changes[mod(i - 1)], changes[mod(i)]}
-			_, ok := table[index]
+			key := [4]int{changes[mod(i - 3)], changes[mod(i - 2)], changes[mod(i - 1)], changes[mod(i)]}
+			_, ok := table[key]
 			if !ok {
-				table[index] = secret % 10
+				table[key] = secret % 10
 			}
 		}
 	}
