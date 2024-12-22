@@ -40,10 +40,10 @@ var Directionalpad = [][]rune{
 }
 
 var order = map[rune]int{
-	'v': 1,
-	'<': 2,
-	'>': 3,
-	'^': 4,
+	'<': 1,
+	'v': 2,
+	'^': 3,
+	'>': 4,
 	'A': 5,
 }
 
@@ -229,7 +229,6 @@ func simplified(counters map[string]int, table map[[2]rune]string) map[string]in
 		m = repair(m, Directionalpad, 1, 3)
 		m = squish(m)
 		splited := strings.Split(m, "A")
-		fmt.Println(m, splited)
 		for _, str := range splited[1:len(splited)-1] {
 			prev, ok := new_map["A"+str+"A"]
 			if ok {
