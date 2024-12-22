@@ -40,8 +40,8 @@ var Directionalpad = [][]rune{
 }
 
 var order = map[rune]int{
-	'v': 2,
-	'<': 1,
+	'v': 1,
+	'<': 2,
 	'>': 3,
 	'^': 4,
 	'A': 5,
@@ -198,7 +198,6 @@ func compress(instr string) (string, int) {
 }
 
 func seqeunce(top, n, value int, code string, table map[[2]rune]string, table_d map[[2]rune]string, cache *map[string]string) int {
-	fmt.Println("N:", n, "SIZE:", len(code))
 	if n == 0 {
 		return value * len(code)
 	}
@@ -212,6 +211,7 @@ func seqeunce(top, n, value int, code string, table map[[2]rune]string, table_d 
 		m := ""
 		val, ok := (*cache)[code]
 		if ok {
+			fmt.Println("USED")
 			m = val
 		} else {
 			m = find(table_d, code)
