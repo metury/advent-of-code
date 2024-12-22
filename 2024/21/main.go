@@ -21,22 +21,22 @@ func print_result(dur time.Duration, part, result int) {
 	fmt.Println("Part " + fmt.Sprint(part) + " [" + Blue + fmt.Sprint(dur) + Reset + "]: " + Yellow + fmt.Sprint(result) + Reset)
 }
 
-const Invalid rune = 'Q'
+const Invalid rune = '#'
 
 var Numpad [][]rune = [][]rune{
-	{'Q', 'Q', 'Q', 'Q', 'Q'},
-	{'Q', '7', '8', '9', 'Q'},
-	{'Q', '4', '5', '6', 'Q'},
-	{'Q', '1', '2', '3', 'Q'},
-	{'Q', 'Q', '0', 'A', 'Q'},
-	{'Q', 'Q', 'Q', 'Q', 'Q'},
+	{'#', '#', '#', '#', '#'},
+	{'#', '7', '8', '9', '#'},
+	{'#', '4', '5', '6', '#'},
+	{'#', '1', '2', '3', '#'},
+	{'#', '#', '0', 'A', '#'},
+	{'#', '#', '#', '#', '#'},
 }
 
-var Directionalpad = [][]rune{
-	{'Q', 'Q', 'Q', 'Q', 'Q'},
-	{'Q', 'Q', '^', 'A', 'Q'},
-	{'Q', '<', 'v', '>', 'Q'},
-	{'Q', 'Q', 'Q', 'Q', 'Q'},
+var Dirpad = [][]rune{
+	{'#', '#', '#', '#', '#'},
+	{'#', '#', '^', 'A', '#'},
+	{'#', '<', 'v', '>', '#'},
+	{'#', '#', '#', '#', '#'},
 }
 
 var order = map[rune]int{
@@ -86,7 +86,7 @@ func append_neighbours(start, current [2]int, instr string, table map[[2]rune]st
 	add_one_neighbour(start, [2]int{current[0], current[1] + 1}, instr, table, pad, '>')
 }
 
-func tabelize(pad [][]rune) map[[2]rune]string {
+func create_mapping(pad [][]rune) map[[2]rune]string {
 	table := make(map[[2]rune]string)
 	for i, row := range pad {
 		for j := range row {
@@ -183,20 +183,6 @@ func squish(instr string) string {
 	return string(runes)
 }
 
-func compress(instr string) (string, int) {
-	var runes []rune
-	sum := 0
-	runes = append(runes, rune(instr[0]))
-	for i := 1; i < len(instr); i++ {
-		if instr[i-1] == instr[i] {
-			sum += 1
-		} else {
-			runes = append(runes, rune(instr[i]))
-		}
-	}
-	return string(runes), sum
-}
-
 func bootstrap(code string, repetitions int, table map[[2]rune]string, table_d map[[2]rune]string) int {
 	m := find(table, code)
 	m = repair(m, Numpad, 4, 3)
@@ -226,7 +212,7 @@ func simplified(counters map[string]int, table map[[2]rune]string) map[string]in
 	new_map := make(map[string]int)
 	for key, val := range counters {
 		m := find(table, key)
-		m = repair(m, Directionalpad, 1, 3)
+		m = repair(m, Dirpad, 1, 3)
 		m = squish(m)
 		splited := strings.Split(m, "A")
 		for _, str := range splited[1:len(splited)-1] {
@@ -245,8 +231,8 @@ func part_one() {
 	var result int
 	start := time.Now()
 	codes := read_file("INPUT")
-	table := tabelize(Numpad)
-	table_d := tabelize(Directionalpad)
+	table := create_mapping(Numpad)
+	table_d := create_mapping(Dirpad)
 	for _, code := range codes {
 		nr, _ := strconv.Atoi(code[:len(code)-1])
 		sum := bootstrap(code, 2, table, table_d)
@@ -260,8 +246,8 @@ func part_two() {
 	var result int
 	start := time.Now()
 	codes := read_file("INPUT")
-	table := tabelize(Numpad)
-	table_d := tabelize(Directionalpad)
+	table := create_mapping(Numpad)
+	table_d := create_mapping(Dirpad)
 	for _, code := range codes {
 		nr, _ := strconv.Atoi(code[:len(code)-1])
 		sum := bootstrap(code, 25, table, table_d)
