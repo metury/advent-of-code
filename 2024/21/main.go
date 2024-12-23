@@ -14,6 +14,7 @@ const (
 	Blue   = "[1;34m"
 	Yellow = "[1;33m"
 	Green  = "[1;32m"
+	Red    = "\033[1;31m"
 	Reset  = "[0m"
 )
 
@@ -187,7 +188,9 @@ func squish(instr string) string {
 	return string(runes)
 }
 
-func bootstrap(code string, repetitions int, table map[[2]rune]string, table_d map[[2]rune]string) int {
+func bootstrap(code string, repetitions int) int {
+	table := create_mapping(Numpad)
+	table_d := create_mapping(Dirpad)
 	m := squish(repair(find(table, code), Numpad, Numstart[0], Numstart[1]))
 	counters := make(map[string]int)
 	splited := strings.Split(m, "A")
@@ -230,11 +233,9 @@ func part_one() {
 	var result int
 	start := time.Now()
 	codes := read_file("INPUT")
-	table := create_mapping(Numpad)
-	table_d := create_mapping(Dirpad)
 	for _, code := range codes {
 		nr, _ := strconv.Atoi(code[:len(code)-1])
-		sum := bootstrap(code, 2, table, table_d)
+		sum := bootstrap(code, 2)
 		result += nr * sum
 	}
 	end := time.Now()
@@ -245,11 +246,9 @@ func part_two() {
 	var result int
 	start := time.Now()
 	codes := read_file("INPUT")
-	table := create_mapping(Numpad)
-	table_d := create_mapping(Dirpad)
 	for _, code := range codes {
 		nr, _ := strconv.Atoi(code[:len(code)-1])
-		sum := bootstrap(code, 25, table, table_d)
+		sum := bootstrap(code, 25)
 		result += nr * sum
 	}
 	end := time.Now()
