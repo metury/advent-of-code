@@ -39,13 +39,13 @@ func mix_and_prune(number, secret int) int {
 }
 
 func mod(number int) int {
-	return ((number % 4) + 4 ) % 4
+	return ((number % 4) + 4) % 4
 }
 
 func generate(secret int) int {
-	secret = mix_and_prune(secret * 64, secret)
-	secret = mix_and_prune(secret / 32, secret)
-	secret = mix_and_prune(secret * 2048, secret)
+	secret = mix_and_prune(secret*64, secret)
+	secret = mix_and_prune(secret/32, secret)
+	secret = mix_and_prune(secret*2048, secret)
 	return secret
 }
 
@@ -55,10 +55,10 @@ func best_sell(secret int, big_table *map[[4]int]int) {
 	last := 0
 	for i := 0; i < 2000; i++ {
 		secret = generate(secret)
-		changes[i % 4] = (secret % 10) - last
+		changes[i%4] = (secret % 10) - last
 		last = secret % 10
 		if changes[3] != -10 {
-			key := [4]int{changes[mod(i - 3)], changes[mod(i - 2)], changes[mod(i - 1)], changes[mod(i)]}
+			key := [4]int{changes[mod(i-3)], changes[mod(i-2)], changes[mod(i-1)], changes[mod(i)]}
 			_, ok := table[key]
 			if !ok {
 				table[key] = secret % 10

@@ -37,16 +37,16 @@ func read_file(file_path string) ([][]bool, [2]int, [2]int) {
 		row := make([]bool, len(line))
 		for j, c := range line {
 			switch c {
-				case '#':
-					row[j] = false
-				case '.':
-					row[j] = true
-				case 'S':
-					row[j] = true
-					start = [2]int{i, j}
-				case 'E':
-					row[j] = true
-					end = [2]int{i, j}
+			case '#':
+				row[j] = false
+			case '.':
+				row[j] = true
+			case 'S':
+				row[j] = true
+				start = [2]int{i, j}
+			case 'E':
+				row[j] = true
+				end = [2]int{i, j}
 			}
 		}
 		m = append(m, row)
@@ -55,7 +55,7 @@ func read_file(file_path string) ([][]bool, [2]int, [2]int) {
 }
 
 func get_neighbours(x, y int) [4][2]int {
-	 return [4][2]int{{x + 1,y}, {x - 1, y}, {x, y + 1},{x, y - 1}}
+	return [4][2]int{{x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1}}
 }
 
 func find_shortest_path(m *[][]bool, position [2]int, length int, visited *[][]int) {
@@ -67,7 +67,7 @@ func find_shortest_path(m *[][]bool, position [2]int, length int, visited *[][]i
 	}
 	(*visited)[position[0]][position[1]] = length
 	for _, neigh := range get_neighbours(position[0], position[1]) {
-		find_shortest_path(m, neigh, length + 1, visited)
+		find_shortest_path(m, neigh, length+1, visited)
 	}
 }
 
@@ -81,7 +81,7 @@ func find_shortcuts(m *[][]bool, visited *[][]int, timer, limit, length int, pos
 		if neigh[0] < 0 || neigh[1] < 0 || neigh[0] >= len(*m) || neigh[1] >= len((*m)[neigh[0]]) {
 			continue
 		}
-		if (*m)[neigh[0]][neigh[1]] && (*visited)[neigh[0]][neigh[1]] - limit >= length {
+		if (*m)[neigh[0]][neigh[1]] && (*visited)[neigh[0]][neigh[1]]-limit >= length {
 			ends[neigh] = true
 		}
 		prev, ok := previous[neigh]
@@ -105,7 +105,7 @@ func count_shortcuts(picoseconds, limit int) int {
 	}
 	find_shortest_path(&m, start_pos, 0, &visited)
 	var wg sync.WaitGroup
-	c := make(chan int, visited[end_pos[0]][end_pos[1]] + 1)
+	c := make(chan int, visited[end_pos[0]][end_pos[1]]+1)
 	wg.Add(visited[end_pos[0]][end_pos[1]] + 1)
 	for i, row := range m {
 		for j := range row {
@@ -113,7 +113,7 @@ func count_shortcuts(picoseconds, limit int) int {
 				ends := make(map[[2]int]bool)
 				go func(i, j int) {
 					defer wg.Done()
-					find_shortcuts(&m, &visited, picoseconds, limit, visited[i][j], [2]int{i,j}, make(map[[2]int]int), ends, true)
+					find_shortcuts(&m, &visited, picoseconds, limit, visited[i][j], [2]int{i, j}, make(map[[2]int]int), ends, true)
 					c <- len(ends)
 				}(i, j)
 			}
