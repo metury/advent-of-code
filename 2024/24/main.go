@@ -33,39 +33,33 @@ type Gate struct {
 	evaluated bool
 }
 
-func read_file(file_path string) ([]Gate, map[string]bool, map[string][2]string) {
+func read_file(file_path string) ([]Gate, map[string]bool) {
 	content, err := os.ReadFile(file_path)
 	if err != nil {
 		log.Fatal(err)
 	}
 	inits := regexp.MustCompile("([0-9a-z]+): (0|1)")
-	and_gates := regexp.MustCompile("([0-9a-z]+) AND ([0-9a-z]+) \\-> ([0-9a-z]+)")
-	or_gates := regexp.MustCompile("([0-9a-z]+) OR ([0-9a-z]+) \\-> ([0-9a-z]+)")
-	xor_gates := regexp.MustCompile("([0-9a-z]+) XOR ([0-9a-z]+) \\-> ([0-9a-z]+)")
+	regex_gates := regexp.MustCompile("([0-9a-z]+) ((?:AND)|(?:OR)|(?:XOR)) ([0-9a-z]+) \\-> ([0-9a-z]+)")
 	values := make(map[string]bool)
 	var gates []Gate
-	reverse_gates := make(map[string][2]string)
 	for _, found := range inits.FindAllStringSubmatch(string(content), -1) {
 		if found[2] == "1" {
 			values[found[1]] = true
 		} else {
 			values[found[1]] = false
 		}
-
 	}
-	for _, found := range and_gates.FindAllStringSubmatch(string(content), -1) {
-		gates = append(gates,Gate {[2]string{found[1], found[2]}, found[3], And, false})
-		reverse_gates[found[3]] = [2]string{found[1], found[2]}
+	for _, found := range regex_gates.FindAllStringSubmatch(string(content), -1) {
+		switch found[2] {
+			case "OR":
+				gates = append(gates,Gate {[2]string{found[1], found[3]}, found[4], Or, false})
+			case "XOR":
+				gates = append(gates,Gate {[2]string{found[1], found[3]}, found[4], Xor, false})
+			case "AND":
+				gates = append(gates,Gate {[2]string{found[1], found[3]}, found[4], And, false})
+		}
 	}
-	for _, found := range or_gates.FindAllStringSubmatch(string(content), -1) {
-		gates = append(gates,Gate {[2]string{found[1], found[2]}, found[3], Or, false})
-		reverse_gates[found[3]] = [2]string{found[1], found[2]}
-	}
-	for _, found := range xor_gates.FindAllStringSubmatch(string(content), -1) {
-		gates = append(gates,Gate {[2]string{found[1], found[2]}, found[3], Xor, false})
-		reverse_gates[found[3]] = [2]string{found[1], found[2]}
-	}
-	return gates, values, reverse_gates
+	return gates, values
 }
 
 func eval_bit(values *map[string]bool, first_symbol byte) (int, []int) {
@@ -93,6 +87,9 @@ func eval_bit(values *map[string]bool, first_symbol byte) (int, []int) {
 }
 
 func evaluate_gates(gates *[]Gate, values *map[string]bool) {
+	for i := range *gates {
+		(*gates)[i].evaluated = false
+	}
 	done := true
 	for done {
 		done = false
@@ -101,9 +98,9 @@ func evaluate_gates(gates *[]Gate, values *map[string]bool) {
 				continue
 			}
 			done = true
-			first, ok := (*values)[gate.inputs[0]]
-			second, sok := (*values)[gate.inputs[1]]
-			if ok && sok {
+			first, first_ok := (*values)[gate.inputs[0]]
+			second, second_ok := (*values)[gate.inputs[1]]
+			if first_ok && second_ok {
 				(*gates)[i].evaluated = true
 				switch gate.gate {
 					case And:
@@ -118,63 +115,41 @@ func evaluate_gates(gates *[]Gate, values *map[string]bool) {
 	}
 }
 
-func print_stack(gate string, reverse_gates *map[string][2]string, bad *map[string]bool) {
-	current := []string{gate}
-	for len(current) > 0{
-		val, ok := (*reverse_gates)[current[0]]
-		if ok {
-			(*bad)[current[0]] = true
-			current = append(current[1:], val[:]...)
-
-		} else {
-			current = current[1:]
+func find_candidates(gates []Gate) []string {
+	var candidates []string
+	for _, gate := range gates {
+		if gate.output[0] == 'z' && gate.gate != Xor{
+			candidates = append(candidates, gate.output)
 		}
 	}
+	sort.Strings(candidates)
+	return candidates[:len(candidates)-1]
 }
 
-
-func find_four(bad *[]string, all *[][4]string, current [4]string, index, global int) {
-	if global == len(*bad) {
-		return
-	}
-	if index == 4 {
-		*all = append(*all, current)
-		return
-	}
-	find_four(bad, all, current, index, global+1)
-	current[index] = (*bad)[global]
-	find_four(bad, all, current, index+1, global+1)
-}
-
-func find_mistakes(gates *[]Gate, values *map[string]bool,  reverse_gates *map[string][2]string) {
-	x, bitx := eval_bit(values, 'x')
-	y, bity := eval_bit(values, 'y')
-	z, bitz := eval_bit(values, 'z')
-	fmt.Println("Z:", z, bitz, "X:", x, bitx, "Y:", y, bity)
-
-	bad := make(map[string]bool)
-
-	acc := 0
-	for i := 0; i < len(bitz) && i < len(bitx) && i < len(bity); i++ {
-		result := bitx[i] + bity[i] + acc
-		acc = result / 2
-		if bitz[i] != result%2 {
-			print_stack(fmt.Sprintf("z%.2d", i), reverse_gates, &bad)
+func find_xors(gates []Gate) []string {
+	var candidates []string
+	for _, gate := range gates {
+		if gate.output[0] != 'z' && gate.gate == Xor{
+			candidates = append(candidates, gate.output)
 		}
 	}
-	var bad_array []string
-	for key := range bad {
-		bad_array = append(bad_array, key)
+	return candidates
+}
+
+func create_tuples(candidates []string, xors []string) [][2]string {
+	var tuples [][2]string
+	for _, candidate := range candidates {
+		for _, xor := range xors {
+			tuples = append(tuples, [2]string{candidate, xor})
+		}
 	}
-	var all [][4]string
-	find_four(&bad_array, &all, [4]string{"", "", "", ""}, 0, 0)
-	fmt.Println(all)
+	return tuples
 }
 
 func part_one() {
 	var result int
 	start := time.Now()
-	gates, values, _ := read_file("INPUT")
+	gates, values := read_file("INPUT")
 	evaluate_gates(&gates, &values)
 	result, _ = eval_bit(&values, 'z')
 	end := time.Now()
@@ -184,9 +159,9 @@ func part_one() {
 func part_two() {
 	var result int
 	start := time.Now()
-	gates, values, reverese_gates := read_file("INPUT")
-	evaluate_gates(&gates, &values)
-	find_mistakes(&gates, &values, &reverese_gates)
+	gates, _ := read_file("INPUT")
+	candidates := create_tuples(find_candidates(gates), find_xors(gates))
+	fmt.Println(candidates, len(find_xors(gates)))
 	end := time.Now()
 	print_result(end.Sub(start), 2, result)
 }
