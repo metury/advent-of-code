@@ -33,7 +33,7 @@ func read_file(file_path string) ([][5]int, [][5]int) {
 	index := 0
 	for _, line := range lines {
 		if len(line) == 0 {
-			buffer[0], buffer[1], buffer[2], buffer[3], buffer[4] = buffer[0] - 1, buffer[1] - 1, buffer[2] - 1, buffer[3] - 1, buffer[4] - 1
+			buffer[0], buffer[1], buffer[2], buffer[3], buffer[4] = buffer[0]-1, buffer[1]-1, buffer[2]-1, buffer[3]-1, buffer[4]-1
 			if key {
 				keys = append(keys, buffer)
 			} else {
@@ -62,10 +62,10 @@ func read_file(file_path string) ([][5]int, [][5]int) {
 func try_all(keys [][5]int, locks [][5]int) int {
 	sum := 0
 	for _, key := range keys {
-		outer:
+	outer:
 		for _, lock := range locks {
 			for i := 0; i < 5; i++ {
-				if key[i] + lock[i] >= 6 {
+				if key[i]+lock[i] >= 6 {
 					continue outer
 				}
 			}
