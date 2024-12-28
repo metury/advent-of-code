@@ -14,7 +14,6 @@ const (
 	Blue   = "[1;34m"
 	Yellow = "[1;33m"
 	Green  = "[1;32m"
-	Red    = "\033[1;31m"
 	Reset  = "[0m"
 )
 
