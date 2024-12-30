@@ -31,7 +31,7 @@ sub print_aoc {
 	open(FH, '>', $name) or die $!;
 	print FH "# Advent of code\n\n";
 	print FH "They are my solutions to [advent of code](https://adventofcode.com/) tasks. There are separated to each year and day. All of this can be found on [GitHub](https://github.com/metury/advent-of-code), also with the script that generates these pages.\n";
-	print FH "Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. Also you may consider joining [Reddit](https://www.reddit.com/r/adventofcode/) where you may find useful tips, or help someone.\n\n";
+	print FH "Plus you may also play a small [Bingo](https://aoc-bingo.fly.dev/) that someone made. Also you may consider joining [Reddit](https://www.reddit.com/r/adventofcode/) where you may find useful tips, or help someone. Lastly there is an [unofficial survey](https://jeroenheijmans.github.io/advent-of-code-surveys/).\n\n";
 	close(FH);
 	if (-e "info.md" ) {
 		print_info("info.md", "$name");
