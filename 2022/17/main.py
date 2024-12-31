@@ -14,15 +14,6 @@ def change(block, x, y):
 			block[i] = (part[0] + x, part[1] + y)
 
 def move(block, movement, blocks):
-	change(block, -1, 0)
-	for part in block:
-		if part[0] < 0:
-			change(block, 1, 0)
-			return True
-		for b in blocks:
-			if b == part:
-				change(block, 1, 0)
-				return True
 	if movement == "<":
 		change(block, 0, -1)
 		for part in block:
@@ -43,6 +34,15 @@ def move(block, movement, blocks):
 				if b == part:
 					change(block, 0, -1)
 					break
+	change(block, -1, 0)
+	for part in block:
+		if part[0] < 0:
+			change(block, 1, 0)
+			return True
+		for b in blocks:
+			if b == part:
+				change(block, 1, 0)
+				return True
 	return False
 
 class Block:
@@ -61,7 +61,6 @@ class Block:
 		if self.current == 0:
 			return [(height+1, 2), (height+1, 3), (height, 2), (height, 3)]
 
-
 def part1():
 	instructions = read_file("INPUT")
 	block = Block()
@@ -71,18 +70,34 @@ def part1():
 	counter = 0
 	i = 0
 	while counter < 2022:
-		end = move(current, instructions[i % len(instructions)], blocks)
-		i += 1
+		end = move(current, instructions[i], blocks)
+		i = (i + 1) % len(instructions)
 		if end:
 			counter += 1
 			for c in current:
 				blocks.append(c)
-			height = max([b[0] for b in blocks]) + 3
+			height = max([b[0] for b in blocks]) + 4
 			current = block.new(height)
-	print(f"Part 1: {max([b[0] for b in blocks])}")
+	print(f"Part 1: {max([b[0] for b in blocks]) + 1}")
 
 def part2():
-	print(f"Part 2: {0}")
+	instructions = read_file("INPUT")
+	block = Block()
+	blocks = []
+	height = 3
+	current = block.new(height)
+	counter = 0
+	i = 0
+	while counter < 1000000000000:
+		end = move(current, instructions[i], blocks)
+		i = (i + 1) % len(instructions)
+		if end:
+			counter += 1
+			for c in current:
+				blocks.append(c)
+			height = max([b[0] for b in blocks]) + 4
+			current = block.new(height)
+	print(f"Part 1: {max([b[0] for b in blocks]) + 1}")
 
 if __name__ == "__main__":
 	print("Year 2022 day 17 - Pyroclastic Flow")
