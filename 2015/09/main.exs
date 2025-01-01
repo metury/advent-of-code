@@ -10,9 +10,7 @@ defmodule Perms do
 end
 
 defmodule Cycle do
-	def compute(_, [_]) do
-		0
-	end
+	def compute(_, [_]), do: 0
 
 	def compute(distances, [t1, t2 | towns]) do
 		{_, _, dist} = Enum.find(distances, fn {t3, t4, _} -> t3 == t1 and t4 == t2 end)
@@ -34,8 +32,8 @@ if {:ok, content} = File.read("INPUT") do
 	IO.puts("Part 1: #{result}")
 end
 
-if {:ok, string} = File.read("INPUT") do
-distances = Regex.scan(~r/([a-zA-Z]+) to ([a-zA-Z]+) = ([0-9]+)/, String.trim(content))
+if {:ok, content} = File.read("INPUT") do
+	distances = Regex.scan(~r/([a-zA-Z]+) to ([a-zA-Z]+) = ([0-9]+)/, String.trim(content))
 	|> Enum.map(fn [_, town1, town2, dist] -> [town1, town2, Integer.parse(dist)] end)
 	|> Enum.map(fn [town1, town2, {dist, _}] -> [{town1, town2, dist}, {town2, town1, dist}] end)
 	|> List.flatten()
