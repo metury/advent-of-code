@@ -28,6 +28,7 @@ if {:ok, content} = File.read("INPUT") do
 	|> Enum.dedup()
 	|> Perms.perms()
 	|> Enum.map(fn towns -> Cycle.compute(distances, towns) end)
-	IO.puts("Part 1: #{Enum.min(lengths)}")
-	IO.puts("Part 2: #{Enum.max(lengths)}")
+	{min, max} = Enum.min_max(lengths)
+	IO.puts("Part 1: #{min}")
+	IO.puts("Part 2: #{max}")
 end

@@ -11,6 +11,6 @@ if {:ok, string} = File.read("INPUT") do
 	{basement, _} = String.trim(string)
 	|> String.graphemes()
 	|> Enum.map(fn c -> if c == "(" do +1 else -1 end end)
-	|> List.foldl({0,0}, fn(x, {index, acc}) -> if acc >= 0 do {index + 1, acc + x} else {index, acc} end end)
+	|> Enum.reduce_while({0,0}, fn x, {index, acc} -> if acc >= 0 do {:cont, {index + 1, acc + x}} else {:halt, {index, acc}} end end)
 	IO.puts("Part 2: #{basement}")
 end
