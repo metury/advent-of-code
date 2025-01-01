@@ -104,7 +104,23 @@ fn part1() {
 }
 
 fn part2() {
-    println!("Part 2: {}", 0);
+    let mut gates = read_file("INPUT");
+    let mut assigned: HashMap<String, u16> = HashMap::new();
+    assigned.insert("".to_string(), 0);
+    while !assigned.contains_key("a") {
+        for gate in &gates {
+            gate.eval(&mut assigned);
+        }
+    }
+    gates.push(Gate{inputs: [assigned["a"].to_string(), "".to_string()], gate_type: GateType::Simple, output: "b".to_string()});
+    let mut assigned2: HashMap<String, u16> = HashMap::new();
+    assigned2.insert("".to_string(), 0);
+    while !assigned2.contains_key("a") {
+        for gate in &gates {
+            gate.eval(&mut assigned2);
+        }
+    }
+    println!("Part 2: {}", assigned2["a"]);
 }
 
 fn main() {
