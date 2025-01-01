@@ -1,4 +1,4 @@
-IO.puts("Year 2015 day 5 - Matchsticks")
+IO.puts("Year 2015 day 8 - Matchsticks")
 
 if {:ok, string} = File.read("INPUT") do
 	result = String.trim(string)
